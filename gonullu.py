@@ -134,6 +134,7 @@ class DockerParams:
         self.cpu_quota = self.cpu_kota * self.cpu_period
 
     def volume(self, local, indocker):
+        os.system("mkdir -p %s" % local)
         self.volumes[indocker] = local
 
     def volumes_str(self):
