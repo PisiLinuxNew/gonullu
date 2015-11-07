@@ -1,15 +1,15 @@
 from setuptools import setup
 
-setup(name='Pisi Gonullu',
+setup(name='Ciftlik Gonullu',
       version='0.1',
       description='Pisi Linux gonullu paket derleme uygulamasi',
       url='#',
       author='Ilker Manap',
       author_email='ilkermanap@gmail.com',
       license='MIT',
-      packages=['pisiclient'],
+      packages=['ciftlikgonullu'],
       install_requires=[
-          'argparse',   'requests'
+          'argparse', 'requests'
       ],
       scripts=['bin/ciftlik-gonullu'],
       include_package_data=True,

@@ -1,4 +1,4 @@
-from pisiclient.docker import Docker
+from ciftlikgonullu.docker import Docker
 
 
 class DockerVolunteer(Docker):
