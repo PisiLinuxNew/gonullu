@@ -1,5 +1,14 @@
-Pisi_Gonullu.egg-info/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
 build/
 dist/
+lib/
+*.egg-info/
+*.egg
+
+# Pycharm
 .idea/
-*.pyc
