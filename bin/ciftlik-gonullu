@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import sys
+import argparse
+import pisiclient
+
+
+def kullanim():
+    print("""
+Kullanim - Usage
+
+Asagidaki satir, docker icindeki /etc/pisi/pisi.conf icinde bulunan
+-j parametresini verecegimiz rakam ile degistirir.
+The command below replaces the -j parameter in the file in the  docker
+image /etc/pisi/pisi.conf with the number given from command line.
+
+sudo python gonullu.py -j 24
+
+
+Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
+%25'ini  ayirir.
+The command below reserves %70 of cpu and %25 of physical memory for
+docker.
+
+sudo python gonullu.py --cpu=70 --memory=25
+
+""")
+    sys.exit()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
+    parser.add_argument('-k', '--kullanim', action="store_true", help="Kullanim. Usage")
+    parser.add_argument('-j', '--make-j-num', action="store", dest="cpucount", default=5, type=int,
+                        help="make icin -j parametresine verilecek rakam. The number for the make -j")
+    parser.add_argument('-e', '--email', action="store", dest="email", type=str,
+                        help="kuyruktan paket alirken gonderilecek olan mail adresi. Email address of the volunteer.")
+    parser.add_argument('-c', '--cpu', action='store', dest='cpu', type=int, default=70,
+                        help="islemci kullanma yuzdesi. 1-100 arasi tamsayi. Cpu limit for docker. A number between \
+                        1-100 as percent.")
+    parser.add_argument('-m', '--memory', action='store', dest='memory', type=int, default=50,
+                        help="Hafiza kullanma yuzdesi. 1-100 arasi tamsayi. Memory limit for docker. A number between \
+                        1-100 as percent of total physical memory")
+
+    args = parser.parse_args()
+    if args.kullanim:
+        kullanim()
+
+    pisi = pisiclient
+    d = pisi.DockerVolunteer(args)
+    f = pisi.Farm("http://ciftlik.pisilinux.org/ciftlik")
+    while 1:
+        g = pisi.Volunteer(f, d)
+        g.wait(15, "Yeni paket almadan once durdurmak icin CTRL-C")

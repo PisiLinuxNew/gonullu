@@ -1,0 +1,5 @@
+Pisi_Gonullu.egg-info/
+build/
+dist/
+.idea/
+*/*.pyc
