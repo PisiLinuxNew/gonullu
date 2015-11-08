@@ -2,7 +2,7 @@ import glob
 import os
 import time
 
-from pisiclient.packager import Packager
+from ciftlikgonullu.packager import Packager
 
 
 class Volunteer(Packager):

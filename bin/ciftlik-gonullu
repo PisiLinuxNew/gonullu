@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import argparse
-import pisiclient
+import ciftlikgonullu
 
 
 def kullanim():
@@ -13,7 +13,7 @@ Asagidaki satir, docker icindeki /etc/pisi/pisi.conf icinde bulunan
 The command below replaces the -j parameter in the file in the  docker
 image /etc/pisi/pisi.conf with the number given from command line.
 
-sudo python gonullu.py -j 24
+sudo ciftlik-gonullu -j 24
 
 
 Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
@@ -21,7 +21,7 @@ Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
 The command below reserves %70 of cpu and %25 of physical memory for
 docker.
 
-sudo python gonullu.py --cpu=70 --memory=25
+sudo ciftlik-gonullu --cpu=70 --memory=25
 
 """)
     sys.exit()
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if args.kullanim:
         kullanim()
 
-    pisi = pisiclient
+    pisi = ciftlikgonullu
     d = pisi.DockerVolunteer(args)
     f = pisi.Farm("http://ciftlik.pisilinux.org/ciftlik")
     while 1:

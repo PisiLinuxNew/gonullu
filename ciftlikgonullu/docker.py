@@ -1,4 +1,4 @@
-from pisiclient.docker_params import DockerParams
+from ciftlikgonullu.docker_params import DockerParams
 import os
 
 
