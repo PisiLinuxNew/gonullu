@@ -11,6 +11,6 @@ setup(name='Ciftlik Gonullu',
       install_requires=[
           'argparse', 'requests'
       ],
-      scripts=['bin/ciftlik-gonullu'],
+      scripts=['bin/gonullu'],
       include_package_data=True,
       zip_safe=False)
