@@ -11,7 +11,7 @@ setup(name='Gonullu',
       license='MIT',
       packages=['gonullu'],
       install_requires=[
-          'argparse', 'requests'
+          'argparse', 'requests', 'docker-py', 'psutil'
       ],
       scripts=['bin/gonullu'],
       include_package_data=True,

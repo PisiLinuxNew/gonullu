@@ -1,4 +1,4 @@
-from gonullunew.docker import Docker
+from gonullu.docker import Docker
 
 
 class Volunteer(Docker):
