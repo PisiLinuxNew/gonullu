@@ -1,5 +1,6 @@
-from docker import Client
 import random
+
+from docker import Client
 import psutil
 
 
@@ -17,27 +18,29 @@ class Docker:
         self.my_container = None
 
     def start(self):
-        # dockerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
+        # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
         self.my_client = Client(base_url='unix://var/run/docker.sock')
+        self.my_client.create_host_config(mem_limit=self.memory_limit, memswap_limit=self.memswap_limit,
+                                          volumes=self.volumes)
         self.my_container = self.my_client.create_container(image=self.image, cpu_shares=self.cpu_shares,
-                                                            cpuset=self.cpu_set,
-                                                            mem_limit=self.memory_limit,
-                                                            memswap_limit=self.memswap_limit,
-                                                            volumes=self.volumes, command=self.command)
-        response = self.my_client.start(container=self.my_container.get('Id'))
-        print(response)
+                                                            cpuset=self.cpu_set, command=self.command)
+        self.my_client.start(container=self.my_container.get('Id'))
 
     def stop(self):
-        # dockerımızı durdurmak için çalıştıracağımız fonksiyonumuz.
+        # containerımızı durdurmak için çalıştıracağımız fonksiyonumuz.
         pass
 
     def remove(self):
-        # dockerımızı silecek fonksiyonumuz
+        # containerımızı silecek fonksiyonumuz
+        pass
+
+    def get_logs(self):
+        # burada oluşan log çıktılarımızı yakalayacağız.
         pass
 
     @staticmethod
     def set_name(name):
-        # docker adımızı atadığımız fonksiyonumuz.
+        # container adımızı atadığımız fonksiyonumuz.
         dictionary = 'abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ-_1234567890'
         dictionary_len = len(dictionary)
         new_name = None
