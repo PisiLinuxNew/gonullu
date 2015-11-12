@@ -19,24 +19,36 @@ class Docker:
 
     def start(self):
         # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
+        # my_client'de çalışan docker process'ini yakalıyorum.
         self.my_client = Client(base_url='unix://var/run/docker.sock')
+        # create_host_config ile limitlerimizi atıyoruz.
         self.my_client.create_host_config(mem_limit=self.memory_limit, memswap_limit=self.memswap_limit,
                                           volumes=self.volumes)
+        # my_container ile konteynırımızı oluşturuyoruz ve onda saklıyoruz.
         self.my_container = self.my_client.create_container(image=self.image, cpu_shares=self.cpu_shares,
-                                                            cpuset=self.cpu_set, command=self.command)
-        self.my_client.start(container=self.my_container.get('Id'))
+                                                            cpuset=self.cpu_set, command=self.command, name=self.name)
+        # ve konteynırımızı çalıştırmaya başlıyoruz.
+        self.my_client.start(self.name)
+
+    def pause(self):
+        # containerımızı durdurmak için çalıştıracağımız fonksiyonumuz.
+        self.my_client.pause(self.name)
+
+    def resume(self):
+        # containerımızı devam ettirmek için çalıştıracağımız fonksiyonumuz.
+        self.my_client.unpause(self.name)
 
     def stop(self):
-        # containerımızı durdurmak için çalıştıracağımız fonksiyonumuz.
-        pass
+        # konteynırımızda ki işlemi iptal etmek için çalıştıracağımız fonksiyonumuz.
+        self.my_client.stop(self.name)
 
     def remove(self):
         # containerımızı silecek fonksiyonumuz
-        pass
+        self.my_client.remove_container(self.name)
 
     def get_logs(self):
         # burada oluşan log çıktılarımızı yakalayacağız.
-        pass
+        self.my_client.logs(self.name)
 
     @staticmethod
     def set_name(name):
