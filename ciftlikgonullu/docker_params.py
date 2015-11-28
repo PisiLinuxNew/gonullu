@@ -31,7 +31,7 @@ class DockerParams:
     def set_name(self, new_name):
         import random
         temp = ''
-        docker_name_allowed_characters = 'abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ-_1234567890'
+        docker_name_allowed_characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_1234567890'
         for c in new_name:
             if c not in docker_name_allowed_characters:
                 c = docker_name_allowed_characters[random.randint(1, 50)]
