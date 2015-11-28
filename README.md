@@ -14,6 +14,10 @@ Uygulamayi sisteminize indirmek icin
   	   git clone https://github.com/PisiLinuxNew/gonullu
   	   cd gonullu
   	   sudo python3 setup.py install
+  	   
+ya da
+
+  	   sudo pip3 install git+https://github.com/PisiLinuxNew/gonullu.git
 
 Uygulamaya verilebilecek parametreleri gormek icin:
 
