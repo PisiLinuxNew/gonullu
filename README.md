@@ -11,17 +11,17 @@ herhangi bir linux dagitiminda da calisabilir.
 
 Uygulamayi sisteminize indirmek icin
 
-  git clone https://github.com/PisiLinuxNew/gonullu
-  cd gonullu
-  sudo python3 setup.py install
+  	   git clone https://github.com/PisiLinuxNew/gonullu
+  	   cd gonullu
+  	   sudo python3 setup.py install
 
 Uygulamaya verilebilecek parametreleri gormek icin:
 
-  gonullu -h
+  	   gonullu -h
 
 ya da
 
-  gonullu --help
+	   gonullu --help
 
 Parametre vermeden kullanirsaniz, islemcinin %70'ini, hafizanin %50'sini kullanacak sekilde
 ayarlanmistir. 
