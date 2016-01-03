@@ -3,7 +3,7 @@ import os
 import time
 
 from ciftlikgonullu.packager import Packager
-
+from ciftlikgonullu.logger import Logger
 
 class Volunteer(Packager):
     def __init__(self, farm, dock):
@@ -15,6 +15,7 @@ class Volunteer(Packager):
         self.branch = None
         self.build()
         self.send()
+        self.logger = None
 
     def take_package_farm(self, email='ilkermanap@gmail.com'):
         d = self.farm.take_package_from_queue(email)
@@ -28,6 +29,7 @@ class Volunteer(Packager):
 
         if d['durum'] == "ok":
             self.package = d['paket']
+            self.logger = Logger(self.package)
             self.docker.params.set_name(self.package)
             self.docker.params.volume("/tmp/varpisi/%s" % self.package, "/var/pisi")
             self.repo = d['repo']
@@ -54,7 +56,12 @@ class Volunteer(Packager):
         extra = "/build/build.sh %s %s %s" % (self.queue_id, self.commit_id, self.package)
         cmd = self.docker.run(extra)
         os.system(cmd)
+        i = 0
         while True:
+            i += 1
+            if (i % 12) == 0: # in every two minute, send the build and error log files to farm
+
+
             time.sleep(10)
             run, success = self.is_running()
             if run == 0:

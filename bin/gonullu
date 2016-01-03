@@ -29,7 +29,8 @@ sudo ciftlik-gonullu --cpu=70 --memory=25
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
-    parser.add_argument('-k', '--kullanim', action="store_true", help="Kullanim. Usage")
+    parser.add_argument('-k', '--kullanim', action="store_true", help="Kullanim. Usage", dest = "report", default=False)
+    parser.add_argument('-r', '--rapor', action="store_true", help="Merkeze raporlama, islemci, ram kullanimi ve derleme loglarinin son birkac satirini belirli araliklarla merkeze gonderir.   Report the cpu and memory usage and also last few lines of compilation logs to center")
     parser.add_argument('-j', '--make-j-num', action="store", dest="cpucount", default=5, type=int,
                         help="make icin -j parametresine verilecek rakam. The number for the make -j")
     parser.add_argument('-e', '--email', action="store", dest="email", type=str,
