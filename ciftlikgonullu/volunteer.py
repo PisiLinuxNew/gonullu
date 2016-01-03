@@ -60,7 +60,7 @@ class Volunteer(Packager):
         while True:
             i += 1
             if (i % 12) == 0: # in every two minute, send the build and error log files to farm
-
+                pass
 
             time.sleep(10)
             run, success = self.is_running()
