@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import sys
 import argparse
-import ciftlikgonullu
+import time
+
+import gonullu
 
 
 def kullanim():
@@ -29,26 +31,39 @@ sudo gonullu --cpu=70 --memory=25
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
-    parser.add_argument('-k', '--kullanim', action="store_true", help="Kullanim. Usage")
-    parser.add_argument('-j', '--make-j-num', action="store", dest="cpucount", default=5, type=int,
-                        help="make icin -j parametresine verilecek rakam. The number for the make -j")
-    parser.add_argument('-e', '--email', action="store", dest="email", type=str,
-                        help="kuyruktan paket alirken gonderilecek olan mail adresi. Email address of the volunteer.")
-    parser.add_argument('-c', '--cpu', action='store', dest='cpu', type=int, default=70,
-                        help="islemci kullanma yuzdesi. 1-100 arasi tamsayi. Cpu limit for docker. A number between \
-                        1-100 as percent.")
-    parser.add_argument('-m', '--memory', action='store', dest='memory', type=int, default=50,
-                        help="Hafiza kullanma yuzdesi. 1-100 arasi tamsayi. Memory limit for docker. A number between \
-                        1-100 as percent of total physical memory")
+    parser.add_argument('-k', '--kullanim', action="store_true", dest="kullanim", default=False)
+    parser.add_argument('-ml', '--memory-limit', action='store', dest='memory_limit', default=50, type=int)
+    parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
+    parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
+    parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
 
     args = parser.parse_args()
-    pisi = ciftlikgonullu
+    print(args)
+    pisi = gonullu
 
     if args.kullanim:
         kullanim()
     else:
-        d = pisi.DockerVolunteer(args)
-        f = pisi.Farm("http://ciftlik.pisilinux.org/ciftlik")
+        farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftliktest', args.email)
+        volunteer = gonullu.Volunteer(args)
         while 1:
-            g = pisi.Volunteer(f, d)
-            g.wait(15, "Yeni paket almadan once durdurmak icin CTRL-C")
+            response = farm.get_package()
+            if response is -1:
+                print("5 sn uyuyalım")
+                time.sleep(5)
+            else:
+                volunteer.get_package_farm(response)
+                while 1:
+                    if volunteer.check():
+                        # container bulunamadı. İşlem bitti.
+                        print('Derleme işlemi bitti yeni paket beklemek için sıraya giriliyor.')
+                        if farm.send_file(response['package_name']):
+                            success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package_name'],
+                                                                             response['package_name']), 'r').read())
+                            farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
+                            volunteer.remove(response['package_name'])
+                        break
+                    else:
+                        # containr bulundu. İşlem sürüyor.
+                        print('Derleme işlemi devam ediyor.')
+                        time.sleep(10)

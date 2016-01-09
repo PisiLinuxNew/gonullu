@@ -1,4 +1,6 @@
 import random
+import os
+import shutil
 
 from docker import Client
 import psutil
@@ -6,27 +8,30 @@ import psutil
 
 class Docker:
     def __init__(self, parameters=None):
-        self.name = self.set_name(parameters.name)
+        self.name = None
         self.memory_limit = self.set_memory_limit(parameters.memory_limit)
         self.memswap_limit = self.set_memswap_limit(parameters.memswap_limit)
-        self.volumes = self.set_volumes(parameters.volumes)
-        self.image = self.set_image(parameters.image)
-        self.cpu_shares = self.set_cpu_shares(parameters.cpu_shares)
+        self.binds = {}
+        self.volumes = []
+        self.image = None
         self.cpu_set = self.set_cpu_set(parameters.cpu_set)
-        self.command = self.set_command(parameters.command)
+        self.command = None
         self.my_client = None
         self.my_container = None
+        self.host_config = None
 
     def start(self):
         # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
         # my_client'de çalışan docker process'ini yakalıyorum.
         self.my_client = Client(base_url='unix://var/run/docker.sock')
-        # create_host_config ile limitlerimizi atıyoruz.
-        self.my_client.create_host_config(mem_limit=self.memory_limit, memswap_limit=self.memswap_limit,
-                                          volumes=self.volumes)
+        # container'ımızın host configlerini yapalım.
+        self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
+        # hadi şimdi aynı isimle bir containerımız var mı görelim.
+        self.control_docker()
         # my_container ile konteynırımızı oluşturuyoruz ve onda saklıyoruz.
-        self.my_container = self.my_client.create_container(image=self.image, cpu_shares=self.cpu_shares,
-                                                            cpuset=self.cpu_set, command=self.command, name=self.name)
+        self.my_container = self.my_client.create_container(image=self.image, command=self.command, name=self.name,
+                                                            volumes=self.volumes,
+                                                            host_config=self.host_config)
         # ve konteynırımızı çalıştırmaya başlıyoruz.
         self.my_client.start(self.name)
 
@@ -42,26 +47,24 @@ class Docker:
         # konteynırımızda ki işlemi iptal etmek için çalıştıracağımız fonksiyonumuz.
         self.my_client.stop(self.name)
 
-    def remove(self):
+    def remove(self, package_name):
         # containerımızı silecek fonksiyonumuz
         self.my_client.remove_container(self.name)
+        shutil.rmtree('/tmp/gonullu/%s' % package_name, ignore_errors=True)
 
     def get_logs(self):
         # burada oluşan log çıktılarımızı yakalayacağız.
         self.my_client.logs(self.name)
 
-    @staticmethod
-    def set_name(name):
+    def set_name(self, name):
         # container adımızı atadığımız fonksiyonumuz.
         dictionary = 'abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ-_1234567890'
         dictionary_len = len(dictionary)
-        new_name = None
+        self.name = ''
         for i in name:
             if i not in dictionary:
                 i = dictionary[random.randint(1, dictionary_len)]
-            new_name += i
-
-        return new_name
+            self.name += str(i)
 
     @staticmethod
     def set_memory_limit(memory_limit):
@@ -73,27 +76,34 @@ class Docker:
         # swap limitimizi atadığımız fonksiyonumuz.
         return int((psutil.swap_memory().total * (memswap_limit / 100))) >> 20
 
-    @staticmethod
-    def set_image(image):
+    def set_image(self, image):
         # imajımızı atadığımız fonksiyonumuz.
-        return image
-
-    @staticmethod
-    def set_cpu_shares(cpu_shares):
-        # paylaşılan cpularımızı atadığımız fonksiyonumuz.
-        return cpu_shares
+        self.image = image
 
     @staticmethod
     def set_cpu_set(cpu_set):
         # atayacağımız cpularımızı atadığımız fonksiyonumuz.
-        return cpu_set
+        return int(cpu_set)
 
-    @staticmethod
-    def set_volumes(volumes):
-        # bölümleri atadığımız fonksiyonumuz.
-        return volumes
+    def add_volume(self, local, indocker):
+        # bölüm ekleyeceğimiz fonksiyonumuz.
+        self.volumes.append(indocker)
+        self.binds[local] = {'bind': indocker, 'mode': 'rw'}
 
-    @staticmethod
-    def set_command(command):
+    def set_command(self, application, queue_id, commit_id, package):
         # çalıştıracağımız komutu atadığımız fonksiyonumuz.
-        return "%s %s %s %s" % (command.application, command.queue_id, command.commit_id, command.package)
+        self.command = '%s %s %s %s' % (application, queue_id, commit_id, package)
+
+    def check(self):
+        # derleme işlemi devam ediyor mu kontrol edelim
+        for container in self.my_client.containers():
+            if container['Names'][0].replace('/', '') == self.name:
+                return 0
+        else:
+            return 1
+
+    def control_docker(self):
+        # oluşacak paketin adı ile önceden docker kaydı var mı kontrol edelim.
+        for container in self.my_client.containers(all=True):
+            if container['Names'][0].replace('/', '') == self.name:
+                self.remove(self.name)
