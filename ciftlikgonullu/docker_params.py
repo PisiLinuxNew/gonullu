@@ -28,7 +28,7 @@ class DockerParams:
             self.cpu_bandwith = params.cpu / 100
             self.cpu_quota = self.cpu_bandwith * self.cpu_period
             self.docker_memory = self.system_memory * params.memory / 100
-            self.report = params.report
+            self.report = params.rapor
 
     def set_name(self, new_name):
         import random

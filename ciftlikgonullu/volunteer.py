@@ -4,6 +4,7 @@ import time
 
 from ciftlikgonullu.packager import Packager
 from ciftlikgonullu.logger import Logger
+from ciftlikgonullu.performance import Performance
 
 class Volunteer(Packager):
     def __init__(self, farm, dock):
@@ -30,6 +31,7 @@ class Volunteer(Packager):
         if d['durum'] == "ok":
             self.package = d['paket']
             self.logger = Logger(self.package)
+            self.performance = Performance()
             self.docker.params.set_name(self.package)
             self.docker.params.volume("/tmp/varpisi/%s" % self.package, "/var/pisi")
             self.repo = d['repo']
@@ -60,6 +62,7 @@ class Volunteer(Packager):
         while True:
             i += 1
             if (i % 12) == 0: # in every two minute, send the build and error log files to farm
+                build_logs, err_logs = self.logger.read_files()
                 pass
 
             time.sleep(10)

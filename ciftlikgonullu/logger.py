@@ -1,6 +1,7 @@
 import subprocess
 import os
 import glob
+import json
 
 class Logger:
     def __init__(self, package_name):
@@ -26,7 +27,7 @@ class Logger:
 
         if buildfile is not None:
             self.build_logs = self.read_log(buildfile)
-
+        return (self.build_logs, self.err_logs)
 
 
     def read_log(self, name, numlines=10):
