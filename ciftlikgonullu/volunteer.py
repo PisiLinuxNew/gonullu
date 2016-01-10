@@ -72,7 +72,7 @@ class Volunteer(Packager):
                 cmd = "updaterunning?id=%s&state=%s" % (self.queue_id, success)
                 self.farm.get(cmd)
                 return
-            print("hala çalışıyor")
+            print("hala calisiyor")
 
     @staticmethod
     def wait(n, mesaj):
