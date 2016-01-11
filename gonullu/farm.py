@@ -39,9 +39,9 @@ class Farm:
             html.close()
             file = '%s.html' % file
         
-        f = {'file': open('%s' % (file), 'rb')}
+        f = {'file': open(file, 'rb')}
         r = requests.post('%s/%s' % (self.url, 'upload'), files=f)
-        hashx = self.sha1file('%s.html' % file)
+        hashx = self.sha1file(file)
         print('>> Uzak sunucu hash: %s', r.text.strip())
         print('>> Yerel sunucu hash: %s', hashx)
 
