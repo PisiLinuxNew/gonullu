@@ -16,16 +16,14 @@ class Docker:
         self.image = None
         self.cpu_set = self.set_cpu_set(parameters.cpu_set)
         self.command = None
-        self.my_client = None
-        self.my_container = None
-        self.host_config = None
-
-    def start(self):
-        # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
         # my_client'de çalışan docker process'ini yakalıyorum.
         self.my_client = Client(base_url='unix://var/run/docker.sock')
         # container'ımızın host configlerini yapalım.
         self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
+        self.my_container = None
+
+    def start(self):
+        # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
         # hadi şimdi aynı isimle bir containerımız var mı görelim.
         self.control_docker()
         # my_container ile konteynırımızı oluşturuyoruz ve onda saklıyoruz.
