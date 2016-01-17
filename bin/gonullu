@@ -44,7 +44,7 @@ if __name__ == "__main__":
     if args.kullanim:
         kullanim()
     else:
-        farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftliktest', args.email)
+        farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
         volunteer = gonullu.Volunteer(args)
         while 1:
             response = farm.get_package()
@@ -57,11 +57,11 @@ if __name__ == "__main__":
                     if volunteer.check():
                         # container bulunamadı. İşlem bitti.
                         print('Derleme işlemi bitti yeni paket beklemek için sıraya giriliyor.')
-                        if farm.send_file(response['package_name']):
-                            success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package_name'],
-                                                                             response['package_name']), 'r').read())
+                        if farm.send_file(response['package']):
+                            success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
+                                                                             response['package']), 'r').read())
                             farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
-                            volunteer.remove(response['package_name'])
+                            volunteer.remove(response['package'])
                         break
                     else:
                         # containr bulundu. İşlem sürüyor.
