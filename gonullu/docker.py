@@ -16,8 +16,20 @@ class Docker:
         self.image = None
         self.cpu_set = self.set_cpu_set(parameters.cpu_set)
         self.command = None
+<<<<<<< HEAD
+        self.my_client = None
+        self.host_config = None
+        self.my_container = None
+
+    def start(self):
+        # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
+        if not self.my_client:
+            # my_client'de çalışan docker process'ini yakalıyorum.
+            self.my_client = Client(base_url='unix://var/run/docker.sock')
+=======
         # my_client'de çalışan docker process'ini yakalıyorum.
         self.my_client = Client(base_url='unix://var/run/docker.sock')
+>>>>>>> c654fe3350e486acd761ae4738aaa97bf835e7e7
         # container'ımızın host configlerini yapalım.
         self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
         self.my_container = None
@@ -48,7 +60,9 @@ class Docker:
     def remove(self, package_name):
         # containerımızı silecek fonksiyonumuz
         self.my_client.remove_container(self.name)
-        shutil.rmtree('/tmp/gonullu/%s' % package_name, ignore_errors=True)
+        self.volumes = []
+        self.binds = {}
+        # shutil.rmtree('/tmp/gonullu/%s' % package_name, ignore_errors=True)
 
     def get_logs(self):
         # burada oluşan log çıktılarımızı yakalayacağız.
