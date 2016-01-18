@@ -42,8 +42,6 @@ class Farm:
         f = {'file': open(file, 'rb')}
         r = requests.post('%s/%s' % (self.url, 'upload'), files=f)
         hashx = self.sha1file(file)
-        print('>> Uzak sunucu hash: %s', r.text.strip())
-        print('>> Yerel sunucu hash: %s', hashx)
 
         if hashx == r.text.strip():
             print('%s Dosyası Başarı ile Gönderildi...' % file)
