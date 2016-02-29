@@ -18,6 +18,10 @@ Uygulamayi sisteminize indirmek icin
 ya da
 
   	   sudo pip3 install git+https://github.com/PisiLinuxNew/gonullu.git
+  	   
+Uygulamayı güncellemek için
+
+  	   sudo pip3 install git+https://github.com/PisiLinuxNew/gonullu.git --upgrade
 
 Uygulamaya verilebilecek parametreleri gormek icin:
 
