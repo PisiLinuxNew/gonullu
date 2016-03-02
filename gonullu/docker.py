@@ -1,6 +1,4 @@
 import random
-import os
-import shutil
 
 from docker import Client
 import psutil
@@ -25,6 +23,7 @@ class Docker:
         if not self.my_client:
             # my_client'de çalışan docker process'ini yakalıyorum.
             self.my_client = Client(base_url='unix://var/run/docker.sock')
+            self.my_client.pull(self.image)
         # container'ımızın host configlerini yapalım.
         self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
         # hadi şimdi aynı isimle bir containerımız var mı görelim.

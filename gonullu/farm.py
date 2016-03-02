@@ -1,6 +1,5 @@
 import requests
 import glob
-import hashlib
 import time
 
 
