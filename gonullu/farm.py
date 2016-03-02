@@ -10,6 +10,7 @@ class Farm:
 
     def get(self, request, json=True):
         # Get isteğini işleyip json data dönen fonksiyonumuz.
+        print('%s/%s' % (self.url, request))
         if json:
             return requests.get('%s/%s' % (self.url, request)).json()
         else:
@@ -50,7 +51,7 @@ class Farm:
             return False
 
     def get_package(self):
-        request = '/%s/%s' % ('requestPkg', self.email)
+        request = '%s/%s' % ('requestPkg', self.email)
         response = self.get(request)
 
         if response['state'] == 200:

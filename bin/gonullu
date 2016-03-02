@@ -65,5 +65,5 @@ if __name__ == "__main__":
                         break
                     else:
                         # containr bulundu. İşlem sürüyor.
-                        print('Derleme işlemi devam ediyor.')
+                        print('Derleme işlemi %s paketi için devam ediyor.' % response['package'])
                         time.sleep(10)
