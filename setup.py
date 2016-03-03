@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='Gonullu',
-      version='0.1',
+      version='0.3',
       description='Pisi Linux gonullu paket derleme uygulamasi',
       url='#',
       author='Ilker Manap',
