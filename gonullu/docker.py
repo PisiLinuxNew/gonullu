@@ -54,9 +54,9 @@ class Docker:
 
     def remove(self, package_name):
         # containerımızı silecek fonksiyonumuz
-        statu = self.my_client.inspect_container(self.name)
-        statu = statu['State']['Running']
-        if statu is True:
+        state = self.my_client.inspect_container(self.name)
+        state = state['State']['Running']
+        if state is True:
             self.my_client.stop(self.name)
         self.my_client.remove_container(self.name)
         self.volumes = []
