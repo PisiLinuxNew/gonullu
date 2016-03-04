@@ -60,7 +60,7 @@ class Farm:
         response = self.get(request)
 
         if response['state'] == 200:
-            self.log.information(message='\nYeni paket bulundu, paketin adı: %s' % response['package'])
+            self.log.information(message='Yeni paket bulundu, paketin adı: %s' % response['package'], new_line=True)
             self.total_time = 0
             return response
 
