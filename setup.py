@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='Gonullu',
-      version='0.3',
+      version='0.4',
       description='Pisi Linux gonullu paket derleme uygulamasi',
       url='#',
       author='Ilker Manap',
@@ -11,7 +11,7 @@ setup(name='Gonullu',
       license='MIT',
       packages=['gonullu'],
       install_requires=[
-          'argparse', 'requests', 'docker-py', 'psutil'
+          'argparse', 'requests', 'docker-py', 'psutil', 'colorama'
       ],
       scripts=['bin/gonullu'],
       include_package_data=True,

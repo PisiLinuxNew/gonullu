@@ -2,15 +2,19 @@ import requests
 import glob
 import time
 
+from gonullu.log import Log
+
 
 class Farm:
     def __init__(self, farm_url, email):
         self.url = farm_url
         self.email = self.mail_control(email)
+        self.time = 10
+        self.log = Log
+        self.total_time = 0
 
     def get(self, request, json=True):
         # Get isteğini işleyip json data dönen fonksiyonumuz.
-        print('%s/%s' % (self.url, request))
         if json:
             return requests.get('%s/%s' % (self.url, request)).json()
         else:
@@ -24,12 +28,12 @@ class Farm:
                 pass
             else:
                 while not (self.send(file)):
-                    print('%s dosyasını yüklemeyi tekrar deniyoruz.' % file)
-                    time.sleep(5)
+                    self.log.warning(message='%s dosyası tekrar gönderilmeye çalışılacak.' % file)
+                    self.wait(reset=True)
         return True
 
     def send(self, file):
-        print('%s Dosyası Gönderiliyor...' % file)
+        self.log.information(message='%s dosyası gönderiliyor.' % file)
         if file.split('.')[-1] in ('err', 'log'):
             content = open(file, 'r').read()
             html = open('%s.html' % file, 'w')
@@ -43,11 +47,12 @@ class Farm:
         r = requests.post('%s/%s' % (self.url, 'upload'), files=f)
         hashx = self.sha1file(file)
 
+        file = file.split('/')[-1]
         if hashx == r.text.strip():
-            print('%s Dosyası Başarı ile Gönderildi...' % file)
+            self.log.success(message='%s dosyası başarı ile gönderildi.' % file)
             return True
         else:
-            print('%s Dosyası Gönderilemedi Tekrar Denenicek!' % file)
+            self.log.error(message='%s dosyası gönderilemedi!' % file)
             return False
 
     def get_package(self):
@@ -55,30 +60,34 @@ class Farm:
         response = self.get(request)
 
         if response['state'] == 200:
-            print('Paket bulundu.')
+            self.log.information(message='Yeni paket bulundu, paketin adı: %s' % response['package'])
+            self.total_time = 0
             return response
 
         elif response['state'] == 401:
-            print('Mail adresi onaylı değildir.')
-            return -1
+            self.log.error(message='Mail adresiniz yetkili değil!')
+            self.log.get_exit()
 
         elif response['state'] == 402:
-            print('Paket bulunamadı.')
             return -1
 
         elif response['state'] == 403:
-            print('Docker imajı bulunamadı.')
-            return -1
+            self.log.error(message='Docker imajı bulunamadı!')
+            self.log.get_exit()
 
         else:
-            print('Belirsiz bir hata oluştu.')
-            return -1
+            self.log.error(message='Tanımlı olmayan bir hata oluştu!')
+            self.log.get_exit()
 
-    @staticmethod
-    def mail_control(email):
-        # Mail adresimiz onaylı mı diye kontrol eden fonksiyonumuz.
-        # TODO: İlker abiden mail adresi onaylı mı diye istek yapabileceğimiz bir url isteyeceğiz.
-        return email
+    def wait(self, message, reset=False):
+        if reset is True:
+            self.total_time = 0
+
+        information_message = '%d saniye%s' % (self.total_time, message)
+        self.log.information(message=information_message, continued=True)
+        time.sleep(self.time)
+        self.total_time += self.time
+
 
     def running_process(self):
         # uygulama çalışmaya devam ettiği sürece siteye bildirim göndereceğiz.
@@ -88,6 +97,12 @@ class Farm:
     def complete_process(self):
         # uygulama çalışması bitince çalışacak olan prosedür fonksiyonumuz.
         pass
+
+    @staticmethod
+    def mail_control(email):
+        # Mail adresimiz onaylı mı diye kontrol eden fonksiyonumuz.
+        # TODO: İlker abiden mail adresi onaylı mı diye istek yapabileceğimiz bir url isteyeceğiz.
+        return email
 
     @staticmethod
     def sha1file(filepath):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import argparse
-import time
+import os
 
 import gonullu
 
@@ -37,33 +37,42 @@ if __name__ == "__main__":
     parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
     parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
 
+    pisi = gonullu
+    log = pisi.Log
+
+    if os.getgid() != 0:
+        log.error('Lütfen programı yönetici(sudo) olarak çalıştırınız.')
+        log.get_exit()
+
+    docker_socket_file = '/var/run/docker.sock'
+    if not os.path.exists(docker_socket_file):
+        log.error(message='Lütfen ilk önce docker servisini çalıştırınız!')
+        log.get_exit()
+
     args = parser.parse_args()
     print(args)
-    pisi = gonullu
 
     if args.kullanim:
         kullanim()
-    else:
-        farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
-        volunteer = gonullu.Volunteer(args)
-        while 1:
-            response = farm.get_package()
-            if response is -1:
-                print("5 sn uyuyalım")
-                time.sleep(5)
-            else:
-                volunteer.get_package_farm(response)
-                while 1:
-                    if volunteer.check():
-                        # container bulunamadı. İşlem bitti.
-                        print('Derleme işlemi bitti yeni paket beklemek için sıraya giriliyor.')
-                        if farm.send_file(response['package']):
-                            success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
-                                                                             response['package']), 'r').read())
-                            farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
-                            volunteer.remove(response['package'])
-                        break
-                    else:
-                        # containr bulundu. İşlem sürüyor.
-                        print('Derleme işlemi %s paketi için devam ediyor.' % response['package'])
-                        time.sleep(10)
+
+    farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
+    volunteer = pisi.Volunteer(args)
+    while 1:
+        response = farm.get_package()
+        if response is -1:
+            farm.wait(message='dir yeni paket bekleniyor.')
+        else:
+            volunteer.get_package_farm(response)
+            while 1:
+                if volunteer.check():
+                    # container bulunamadı. İşlem bitti.
+                    if farm.send_file(response['package']):
+                        success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
+                                                                         response['package']), 'r').read())
+                        farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
+                        volunteer.remove(response['package'])
+                        log.success(message='derleme işlemi %s paketi için bitti.' % response['package'])
+                    break
+                else:
+                    # container bulundu. İşlem sürüyor.
+                    farm.wait(message='den beri derleme işlemi %s paketi için devam ediyor.' % response['package'])

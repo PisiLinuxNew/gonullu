@@ -2,10 +2,12 @@ import random
 
 from docker import Client
 import psutil
+from gonullu.log import Log
 
 
 class Docker:
     def __init__(self, parameters=None):
+        self.log = Log
         self.name = None
         self.memory_limit = self.set_memory_limit(parameters.memory_limit)
         self.memswap_limit = self.set_memswap_limit(parameters.memswap_limit)
@@ -23,6 +25,8 @@ class Docker:
         if not self.my_client:
             # my_client'de çalışan docker process'ini yakalıyorum.
             self.my_client = Client(base_url='unix://var/run/docker.sock')
+
+
         # container'ımızın host configlerini yapalım.
         self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
         # hadi şimdi aynı isimle bir containerımız var mı görelim.
