@@ -1,6 +1,7 @@
-import requests
 import glob
 import time
+
+import requests
 
 from gonullu.log import Log
 
@@ -42,7 +43,7 @@ class Farm:
             html.write('</pre></body></html>')
             html.close()
             file = '%s.html' % file
-        
+
         f = {'file': open(file, 'rb')}
         r = requests.post('%s/%s' % (self.url, 'upload'), files=f)
         hashx = self.sha1file(file)
@@ -88,12 +89,11 @@ class Farm:
         time.sleep(self.time)
         self.total_time += self.time
 
-    def set_total_time(self, time):
-        self.total_time = time
+    def set_total_time(self, new_time):
+        self.total_time = new_time
 
     def get_total_time(self):
         return self.total_time
-
 
     def running_process(self):
         # uygulama çalışmaya devam ettiği sürece siteye bildirim göndereceğiz.
