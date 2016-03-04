@@ -2,6 +2,7 @@
 import sys
 import argparse
 import os
+import signal
 
 import gonullu
 
@@ -29,6 +30,10 @@ sudo gonullu --cpu=70 --memory=25
     sys.exit()
 
 
+def call_exit():
+    volunteer.remove()
+    log.get_exit()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
     parser.add_argument('-k', '--kullanim', action="store_true", dest="kullanim", default=False)
@@ -36,6 +41,11 @@ if __name__ == "__main__":
     parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
     parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
     parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
+
+    # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
+    signal.signal(signal.SIGINT, call_exit())
+    # CTRL+Z sinyali iptal edildi.
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
     pisi = gonullu
     log = pisi.Log
@@ -70,7 +80,7 @@ if __name__ == "__main__":
                         success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
                                                                          response['package']), 'r').read())
                         farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
-                        volunteer.remove(response['package'])
+                        volunteer.remove()
                         log.success(message='derleme işlemi %s paketi için %s saniyede bitti.' % (response['package'],
                                                                                                   farm.get_total_time())
                                     )

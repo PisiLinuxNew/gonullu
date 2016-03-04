@@ -52,7 +52,7 @@ class Docker:
         # konteynırımızda ki işlemi iptal etmek için çalıştıracağımız fonksiyonumuz.
         self.my_client.stop(self.name)
 
-    def remove(self, package_name):
+    def remove(self):
         # containerımızı silecek fonksiyonumuz
         state = self.my_client.inspect_container(self.name)
         state = state['State']['Running']
