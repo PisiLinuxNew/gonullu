@@ -118,3 +118,9 @@ class Docker:
         for container in self.my_client.containers(all=True):
             if container['Names'][0].replace('/', '') == self.name:
                 self.remove(self.name)
+
+    def exit_signal(self, signal, frame):
+        if self.name:
+            self.remove()
+        self.log.warning(message='CTRL+C\'ye tıkladınız!', new_line=True)
+        self.log.get_exit()
