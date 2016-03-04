@@ -24,7 +24,7 @@ class Log:
                 print(Fore.LIGHTBLUE_EX + ' [*] Bilgi: ' + message + Style.RESET_ALL)
 
     @staticmethod
-    def success(message, new_line=True):
+    def success(message, new_line=False):
         # burada başlarılı işlem mesajlarımızı yazdıracağız.
         if new_line is True:
             print('')

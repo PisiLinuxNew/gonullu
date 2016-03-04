@@ -91,6 +91,9 @@ class Farm:
     def set_total_time(self, time):
         self.total_time = time
 
+    def get_total_time(self):
+        return self.total_time
+
 
     def running_process(self):
         # uygulama çalışmaya devam ettiği sürece siteye bildirim göndereceğiz.
