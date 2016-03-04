@@ -43,3 +43,7 @@ class Log:
         print(Fore.RED + '  [x] Programdan çıkılıyor!' +Style.RESET_ALL)
         os.system("stty echo")
         sys.exit(0)
+
+    @staticmethod
+    def blank_line():
+        print()

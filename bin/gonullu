@@ -82,6 +82,7 @@ if __name__ == "__main__":
                         log.success(message='derleme işlemi %s paketi için %s saniyede bitti.' % (response['package'],
                                                                                                   farm.get_total_time())
                                     )
+                        log.blank_line()
                         farm.set_total_time(0)
                     break
                 else:
