@@ -61,6 +61,7 @@ class Docker:
         self.my_client.remove_container(self.name)
         self.volumes = []
         self.binds = {}
+        self.name = None
         # shutil.rmtree('/tmp/gonullu/%s' % package_name, ignore_errors=True)
 
     def get_logs(self):
@@ -120,7 +121,7 @@ class Docker:
                 self.remove(self.name)
 
     def exit_signal(self, signal, frame):
-        if self.name:
+        if self.name is not None:
             self.remove()
         self.log.warning(message='CTRL+C\'ye tıkladınız!', new_line=True)
         self.log.get_exit()
