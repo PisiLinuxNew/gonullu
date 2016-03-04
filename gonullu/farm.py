@@ -33,7 +33,7 @@ class Farm:
         return True
 
     def send(self, file):
-        self.log.information(message='%s dosyası gönderiliyor.' % file)
+        self.log.information(message='%s dosyası gönderiliyor.' % file.split('/')[-1])
         if file.split('.')[-1] in ('err', 'log'):
             content = open(file, 'r').read()
             html = open('%s.html' % file, 'w')
