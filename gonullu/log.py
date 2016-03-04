@@ -1,5 +1,6 @@
 from colorama import init, Fore, Style
 import sys
+import os
 
 
 class Log:
@@ -40,4 +41,5 @@ class Log:
     @staticmethod
     def get_exit():
         print(Fore.RED + '  [x] Programdan çıkılıyor!' +Style.RESET_ALL)
+        os.system("stty echo")
         sys.exit(0)

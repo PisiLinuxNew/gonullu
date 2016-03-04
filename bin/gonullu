@@ -27,9 +27,11 @@ docker.
 sudo gonullu --cpu=70 --memory=25
 
 """)
+    os.system("stty echo")
     sys.exit()
 
 if __name__ == "__main__":
+    os.system("stty -echo")
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
     parser.add_argument('-k', '--kullanim', action="store_true", dest="kullanim", default=False)
     parser.add_argument('-ml', '--memory-limit', action='store', dest='memory_limit', default=50, type=int)
