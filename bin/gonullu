@@ -30,9 +30,9 @@ sudo gonullu --cpu=70 --memory=25
     sys.exit()
 
 
-def call_exit():
-    volunteer.remove()
-    log.get_exit()
+def call_exit(logger, docker_volunteer):
+    docker_volunteer.remove()
+    logger.get_exit()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
@@ -41,11 +41,6 @@ if __name__ == "__main__":
     parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
     parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
     parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
-
-    # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
-    signal.signal(signal.SIGINT, call_exit())
-    # CTRL+Z sinyali iptal edildi.
-    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
 
     pisi = gonullu
     log = pisi.Log
@@ -67,6 +62,12 @@ if __name__ == "__main__":
 
     farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
     volunteer = pisi.Volunteer(args)
+
+    # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
+    signal.signal(signal.SIGINT, call_exit(log, volunteer))
+    # CTRL+Z sinyali iptal edildi.
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+
     while 1:
         response = farm.get_package()
         if response is -1:
