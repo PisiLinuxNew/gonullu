@@ -71,7 +71,9 @@ if __name__ == "__main__":
                                                                          response['package']), 'r').read())
                         farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
                         volunteer.remove(response['package'])
-                        log.success(message='derleme işlemi %s paketi için bitti.' % response['package'])
+                        log.success(message='derleme işlemi %s paketi için bitti.' % response['package'],
+                                    new_line=True)
+                        farm.set_total_time(0)
                     break
                 else:
                     # container bulundu. İşlem sürüyor.

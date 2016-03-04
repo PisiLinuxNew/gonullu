@@ -18,14 +18,19 @@ class Log:
             print(Fore.LIGHTBLUE_EX + ' [*] Bilgi: ' + message + Style.RESET_ALL, end="\r")
         else:
             if new_line is True:
-                print('\n' + Fore.LIGHTBLUE_EX + ' [*] Bilgi: ' + message + Style.RESET_ALL)
+                print('')
+                print(Fore.LIGHTBLUE_EX + ' [*] Bilgi: ' + message + Style.RESET_ALL)
             else:
                 print(Fore.LIGHTBLUE_EX + ' [*] Bilgi: ' + message + Style.RESET_ALL)
 
     @staticmethod
-    def success(message):
+    def success(message, new_line=True):
         # burada başlarılı işlem mesajlarımızı yazdıracağız.
-        print(Fore.GREEN + ' [+] Başarılı: ' + message + Style.RESET_ALL)
+        if new_line is True:
+            print('')
+            print(Fore.GREEN + ' [+] Başarılı: ' + message + Style.RESET_ALL)
+        else:
+            print(Fore.GREEN + ' [+] Başarılı: ' + message + Style.RESET_ALL)
 
     @staticmethod
     def warning(message):

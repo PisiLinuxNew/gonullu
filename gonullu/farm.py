@@ -88,6 +88,9 @@ class Farm:
         time.sleep(self.time)
         self.total_time += self.time
 
+    def set_total_time(self, time):
+        self.total_time = time
+
 
     def running_process(self):
         # uygulama çalışmaya devam ettiği sürece siteye bildirim göndereceğiz.
