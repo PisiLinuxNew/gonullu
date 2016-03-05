@@ -120,7 +120,7 @@ class Docker:
             if container['Names'][0].replace('/', '') == self.name:
                 self.remove(self.name)
 
-    def exit_signal(self, signal, frame):
+    def exit_signal(self):
         if self.name is not None:
             self.remove()
         self.log.warning(message='CTRL+C\'ye tıkladınız!', new_line=True)

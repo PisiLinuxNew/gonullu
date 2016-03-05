@@ -30,41 +30,8 @@ sudo gonullu --cpu=70 --memory=25
     os.system("stty echo")
     sys.exit()
 
-if __name__ == "__main__":
-    os.system("stty -echo")
-    parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
-    parser.add_argument('-k', '--kullanim', action="store_true", dest="kullanim", default=False)
-    parser.add_argument('-ml', '--memory-limit', action='store', dest='memory_limit', default=50, type=int)
-    parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
-    parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
-    parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
 
-    pisi = gonullu
-    log = pisi.Log
-
-    if os.getgid() != 0:
-        log.error('Lütfen programı yönetici(sudo) olarak çalıştırınız.')
-        log.get_exit()
-
-    docker_socket_file = '/var/run/docker.sock'
-    if not os.path.exists(docker_socket_file):
-        log.error(message='Lütfen ilk önce docker servisini çalıştırınız!')
-        log.get_exit()
-
-    args = parser.parse_args()
-    print(args)
-
-    if args.kullanim:
-        kullanim()
-
-    farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
-    volunteer = pisi.Volunteer(args)
-
-    # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
-    signal.signal(signal.SIGINT, volunteer.exit_signal)
-    # CTRL+Z sinyali iptal edildi.
-    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
-
+def main(log, volunteer, farm):
     while 1:
         response = farm.get_package()
         if response is -1:
@@ -88,3 +55,43 @@ if __name__ == "__main__":
                 else:
                     # container bulundu. İşlem sürüyor.
                     farm.wait(message='den beri derleme işlemi %s paketi için devam ediyor.' % response['package'])
+
+
+if __name__ == "__main__":
+    pisi = gonullu
+    log = pisi.Log
+
+    parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
+    parser.add_argument('-k', '--kullanim', action="store_true", dest="kullanim", default=False)
+    parser.add_argument('-ml', '--memory-limit', action='store', dest='memory_limit', default=50, type=int)
+    parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
+    parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
+    parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
+
+    if os.getgid() != 0:
+        log.error('Lütfen programı yönetici(sudo) olarak çalıştırınız.')
+        log.get_exit()
+
+    docker_socket_file = '/var/run/docker.sock'
+    if not os.path.exists(docker_socket_file):
+        log.error(message='Lütfen ilk önce docker servisini çalıştırınız!')
+        log.get_exit()
+
+    args = parser.parse_args()
+    print(args)
+
+    if args.kullanim:
+        kullanim()
+
+    farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
+    volunteer = pisi.Volunteer(args)
+
+    # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
+    signal.signal(signal.SIGINT, volunteer.exit_signal)
+    # CTRL+Z sinyali iptal edildi.
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+    try:
+        os.system("stty -echo")
+        main(log, volunteer, farm)
+    finally:
+        volunteer.exit_signal()
