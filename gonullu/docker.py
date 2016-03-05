@@ -26,7 +26,6 @@ class Docker:
             # my_client'de çalışan docker process'ini yakalıyorum.
             self.my_client = Client(base_url='unix://var/run/docker.sock')
 
-
         # container'ımızın host configlerini yapalım.
         self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
         # hadi şimdi aynı isimle bir containerımız var mı görelim.
@@ -118,7 +117,7 @@ class Docker:
         # oluşacak paketin adı ile önceden docker kaydı var mı kontrol edelim.
         for container in self.my_client.containers(all=True):
             if container['Names'][0].replace('/', '') == self.name:
-                self.remove(self.name)
+                self.remove()
 
     def exit_signal(self):
         if self.name is not None:
