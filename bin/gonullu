@@ -31,30 +31,31 @@ sudo gonullu --cpu=70 --memory=25
     sys.exit()
 
 
-def main(log, volunteer, farm):
+def main(log_main, volunteer_main, farm_main):
     while 1:
-        response = farm.get_package()
+        response = farm_main.get_package()
         if response is -1:
-            farm.wait(message='dir yeni paket bekleniyor.')
+            farm_main.wait(message='dir yeni paket bekleniyor.')
         else:
-            volunteer.get_package_farm(response)
+            volunteer_main.get_package_farm(response)
             while 1:
-                if volunteer.check():
+                if volunteer_main.check():
                     # container bulunamadı. İşlem bitti.
-                    if farm.send_file(response['package']):
+                    if farm_main.send_file(response['package']):
                         success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
                                                                          response['package']), 'r').read())
-                        farm.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
-                        volunteer.remove()
-                        log.success(message='derleme işlemi %s paketi için %s saniyede bitti.' % (response['package'],
-                                                                                                  farm.get_total_time())
-                                    )
-                        log.blank_line()
-                        farm.set_total_time(0)
+                        farm_main.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
+                        volunteer_main.remove()
+                        log_main.success(
+                            message='derleme işlemi %s paketi için %s saniyede bitti.' % (response['package'],
+                                                                                          farm_main.get_total_time())
+                        )
+                        log_main.blank_line()
+                        farm_main.set_total_time(0)
                     break
                 else:
                     # container bulundu. İşlem sürüyor.
-                    farm.wait(message='den beri derleme işlemi %s paketi için devam ediyor.' % response['package'])
+                    farm_main.wait(message='den beri derleme işlemi %s paketi için devam ediyor.' % response['package'])
 
 
 if __name__ == "__main__":
