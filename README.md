@@ -31,8 +31,7 @@ ya da
 
 	   gonullu --kullanim
 
-Parametre vermeden kullanirsaniz, islemcinin %70'ini, hafizanin %50'sini kullanacak sekilde
-ayarlanmistir. 
+Parametre vermeden kullanırsanız 1 adet cpu ve hafızanın %50'sini kullanacak şekilde ayarlanmistir. 
 
 ## Parametreler
 

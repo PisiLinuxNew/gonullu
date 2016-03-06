@@ -73,6 +73,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
+    if not args.email:
+        log.error(message='Lütfen bir mail adresi belirtiniz. (-e parametresi)')
+        log.get_exit()
+
     if args.kullanim:
         kullanim()
 
