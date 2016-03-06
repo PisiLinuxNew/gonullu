@@ -51,7 +51,7 @@ def main(log_main, volunteer_main, farm_main):
                                                                                           farm_main.get_total_time())
                         )
                         log_main.blank_line()
-                        farm_main.set_total_time(0)
+                        farm_main.wait(reset=True)
                     break
                 else:
                     # container bulundu. İşlem sürüyor.

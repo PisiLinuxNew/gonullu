@@ -30,7 +30,7 @@ class Farm:
             else:
                 while not (self.send(file)):
                     self.log.warning(message='%s dosyası tekrar gönderilmeye çalışılacak.' % file)
-                    self.wait(reset=True)
+                    self.wait()
         return True
 
     def send(self, file):
@@ -80,17 +80,15 @@ class Farm:
             self.log.error(message='Tanımlı olmayan bir hata oluştu!')
             self.log.get_exit()
 
-    def wait(self, message, reset=False):
+    def wait(self, message='', reset=False):
         if reset is True:
             self.total_time = 0
 
-        information_message = '%d saniye%s' % (self.total_time, message)
-        self.log.information(message=information_message, continued=True)
+        if not message == '':
+            information_message = '%d saniye%s' % (self.total_time, message)
+            self.log.information(message=information_message, continued=True)
         time.sleep(self.time)
         self.total_time += self.time
-
-    def set_total_time(self, new_time):
-        self.total_time = new_time
 
     def get_total_time(self):
         return self.total_time
@@ -117,6 +115,7 @@ class Farm:
         with open(filepath, 'rb') as f:
             while True:
                 block = f.read(2 ** 10)  # Magic number: one-megabyte blocks.
-                if not block: break
+                if not block:
+                    break
                 sha.update(block)
             return sha.hexdigest()

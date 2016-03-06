@@ -37,10 +37,9 @@ class Log:
             print('')
         print(Fore.YELLOW + '  [!] Uyarı: ' + message + Style.RESET_ALL)
 
-
     @staticmethod
     def get_exit():
-        print(Fore.RED + '  [x] Programdan çıkılıyor!' +Style.RESET_ALL)
+        print(Fore.RED + '  [x] Programdan çıkılıyor!' + Style.RESET_ALL)
         os.system("stty echo")
         sys.exit(0)
 
