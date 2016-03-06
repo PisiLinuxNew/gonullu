@@ -11,20 +11,12 @@ def kullanim():
     print("""
 Kullanim - Usage
 
-Asagidaki satir, docker icindeki /etc/pisi/pisi.conf icinde bulunan
--j parametresini verecegimiz rakam ile degistirir.
-The command below replaces the -j parameter in the file in the  docker
-image /etc/pisi/pisi.conf with the number given from command line.
-
-sudo gonullu -j 24
-
-
-Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
-%25'ini  ayirir.
-The command below reserves %70 of cpu and %25 of physical memory for
+Asagidaki satir, docker için 1 işlemci, fiziksel hafızanın
+%50'sini  ayırır.
+The command below reserves 1 cpu and %50 of physical memory for
 docker.
 
-sudo gonullu --cpu=70 --memory=25
+sudo gonullu --cpu-set=1 --memory-limit=50
 
 """)
     os.system("stty echo")
