@@ -3,7 +3,6 @@ from setuptools import setup, Command
 
 
 class CleanCommand(Command):
-    """Custom clean command to tidy up the project root."""
     user_options = []
 
     def initialize_options(self):
@@ -31,4 +30,7 @@ setup(name='Gonullu',
       ],
       scripts=['bin/gonullu'],
       include_package_data=True,
-      zip_safe=False)
+      zip_safe=False,
+      cmdclass={
+        'clean': CleanCommand,
+    })
