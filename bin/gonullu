@@ -90,5 +90,9 @@ if __name__ == "__main__":
     try:
         os.system("stty -echo")
         main(log, volunteer, farm)
+    except:
+        e = sys.exc_info()[0]
+        log.error(e)
+        log.get_exit()
     finally:
         volunteer.exit_signal()
