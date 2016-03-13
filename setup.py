@@ -18,11 +18,11 @@ class CleanCommand(Command):
 setup(name='Gonullu',
       version='0.4',
       description='Pisi Linux gonullu paket derleme uygulamasi',
-      url='#',
+      url='https://github.com/PisiLinuxNew/gonullu',
       author='Ilker Manap',
       author_email='ilkermanap@gmail.com',
-      contributor='Muhammet Dilmaç',
-      contributor_email='m.dilmac1994@gmail.com',
+      maintainer='Muhammet Dilmaç',
+      maintainer_email='iletisim@muhammetdilmac.com.tr',
       license='MIT',
       packages=['gonullu'],
       install_requires=[
@@ -32,5 +32,5 @@ setup(name='Gonullu',
       include_package_data=True,
       zip_safe=False,
       cmdclass={
-        'clean': CleanCommand,
-    })
+          'clean': CleanCommand,
+      })

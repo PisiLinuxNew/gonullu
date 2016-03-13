@@ -1,26 +1,9 @@
 #!/usr/bin/env python3
-import sys
 import argparse
 import os
 import signal
 
 import gonullu
-
-
-def kullanim():
-    print("""
-Kullanim - Usage
-
-Asagidaki satir, docker için 1 işlemci, fiziksel hafızanın
-%50'sini  ayırır.
-The command below reserves 1 cpu and %50 of physical memory for
-docker.
-
-sudo gonullu --cpu-set=1 --memory-limit=50
-
-""")
-    os.system("stty echo")
-    sys.exit()
 
 
 def main(log_main, volunteer_main, farm_main):
@@ -55,7 +38,6 @@ if __name__ == "__main__":
     log = pisi.Log
 
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
-    parser.add_argument('-k', '--kullanim', action="store_true", dest="kullanim", default=False)
     parser.add_argument('-ml', '--memory-limit', action='store', dest='memory_limit', default=50, type=int)
     parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
     parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
@@ -77,9 +59,6 @@ if __name__ == "__main__":
         log.error(message='Lütfen bir mail adresi belirtiniz. (-e parametresi)')
         log.get_exit()
 
-    if args.kullanim:
-        kullanim()
-
     farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
     volunteer = pisi.Volunteer(args)
 
@@ -90,9 +69,5 @@ if __name__ == "__main__":
     try:
         os.system("stty -echo")
         main(log, volunteer, farm)
-    except:
-        e = sys.exc_info()[0]
-        log.error(e)
-        log.get_exit()
     finally:
         volunteer.exit_signal()
