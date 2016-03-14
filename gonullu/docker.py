@@ -10,7 +10,6 @@ class Docker:
         self.log = Log
         self.name = None
         self.memory_limit = self.set_memory_limit(parameters.memory_limit)
-        self.memswap_limit = self.set_memswap_limit(parameters.memswap_limit)
         self.binds = {}
         self.volumes = []
         self.image = None
@@ -81,11 +80,6 @@ class Docker:
     def set_memory_limit(memory_limit):
         # ram limitimizi atadığımız fonksiyonumuz.
         return int((psutil.virtual_memory().total * (memory_limit / 100))) >> 20
-
-    @staticmethod
-    def set_memswap_limit(memswap_limit):
-        # swap limitimizi atadığımız fonksiyonumuz.
-        return int((psutil.swap_memory().total * (memswap_limit / 100))) >> 20
 
     def set_image(self, image):
         # imajımızı atadığımız fonksiyonumuz.

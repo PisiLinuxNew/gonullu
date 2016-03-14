@@ -38,13 +38,10 @@ Parametre vermeden kullanırsanız 1 adet cpu ve hafızanın %50'sini kullanacak
 * -k veya --kullanim:
 Yazılımın kullanımı ile ilgili bilgi içerir
 
-* -ml veya --memory-limit:
+* -m veya --memory
 Docker tarafından kullanılacak fiziksel ramin limiti
 
-* -msl veya --memory-swap-limit:
-Docker tarafından kullanılacak swap alanı limiti
-
-* -cs veya --cpu-set:
+* -c veya --cpu
 Docker tarafından kullanılmak üzere ayarlanacak cpu sayısı
 
 * -e veya --email:

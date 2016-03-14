@@ -38,9 +38,8 @@ if __name__ == "__main__":
     log = pisi.Log
 
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
-    parser.add_argument('-ml', '--memory-limit', action='store', dest='memory_limit', default=50, type=int)
-    parser.add_argument('-msl', '--memory-swap-limit', action='store', dest='memswap_limit', default=50, type=int)
-    parser.add_argument('-cs', '--cpu-set', action='store', dest='cpu_set', default=1, type=int)
+    parser.add_argument('-m', '--memory', action='store', dest='memory_limit', default=50, type=int)
+    parser.add_argument('-c', '--cpu', action='store', dest='cpu_set', default=1, type=int)
     parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
 
     if os.getgid() != 0:
