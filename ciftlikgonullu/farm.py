@@ -26,7 +26,7 @@ class Farm:
                 return r['dockerimage']
         return None
 
-    def send_file(self, fname):
+    def send_file(self, fname, binpath):
         cmd = "upload"
         extension = ""
         if fname.split(".")[-1] in ("err", "log"):
@@ -38,7 +38,7 @@ class Farm:
             htm.close()
             extension = ".html"
         f = {'file': open("%s%s" % (fname, extension), 'rb')}
-        r = requests.post("%s/%s" % (self.url, cmd), files=f)
+        r = requests.post("%s/%s" % (self.url, cmd), data = {'binrepopath':binpath}, files=f)
         hashx = os.popen("sha1sum %s%s" % (fname, extension), "r").readlines()[0].split()[0].strip()
         print(">> uzak hash   : %s" % r.text.strip())
         print(">> yakin hash  : %s" % hashx)
@@ -48,10 +48,10 @@ class Farm:
         else:
             return False
 
-    def send_files(self, mylist):
+    def send_files(self, mylist, binpath):
         for f in mylist:
             print("dosya gonderiliyor, %s" % f)
-            if self.send_file(f):
+            if self.send_file(f, binpath):
                 print("%s gonderildi" % f)
             else:
                 while not(self.send_file(f)):

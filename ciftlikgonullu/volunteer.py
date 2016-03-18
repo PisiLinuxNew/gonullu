@@ -16,6 +16,7 @@ class Volunteer(Packager):
         self.branch = None
         self.build()
         self.send()
+        self.repo_binary_path = None
         self.logger = None
 
     def take_package_farm(self, email='ilkermanap@gmail.com'):
@@ -29,6 +30,8 @@ class Volunteer(Packager):
             d = self.farm.take_package_from_queue(email)
 
         if d['durum'] == "ok":
+            self.repo_binary_path = d['binary_repo_dir']
+            print(self.repo_binary_path)
             self.package = d['paket']
             self.logger = Logger(self.package)
             self.performance = Performance()
@@ -47,7 +50,7 @@ class Volunteer(Packager):
     def send(self):
         liste = glob.glob("/tmp/%s/*.[lpe]*" % self.package)
         print(liste)
-        self.farm.send_files(liste)
+        self.farm.send_files(liste, self.repo_binary_path)
         if self.docker.rm("%s-sil" % self.docker.params.name) != 0:
             print("imaj silinemedi %s" % self.package)
         tmptemizle = "rm -rf /tmp/%s" % self.package
@@ -88,8 +91,8 @@ class Volunteer(Packager):
         if kernel_require is True:
             krn = ' kernel '
         build_sh = """#!/bin/bash
-service dbus start && pisi cp && pisi ar pisi-2.0 http://ciftlik.pisilinux.org/pisi-2.0/pisi-index.xml.xz && pisi it --ignore-safety --ignore-dependency autoconf autogen automake binutils bison flex gawk gc gcc gnuconfig guile libmpc libtool-ltdl libtool lzo m4 make mpfr pkgconfig yacc glibc-devel isl %s
-pisi ar core https://github.com/pisilinux/core/raw/master/pisi-index.xml.xz && pisi ar main https://github.com/pisilinux/main/raw/master/pisi-index.xml.xz --at 2
+    service dbus start && pisi cp && pisi ar pisiBeta --ignore-check http://ciftlik.pisilinux.org/2.0-Beta/pisi-index.xml.xz && pisi ar pisi-2.0 --at 2 --ignore-check   http://ciftlik.pisilinux.org/pisi-2.0/pisi-index.xml.xz && pisi it --ignore-safety --ignore-dependency autoconf autogen automake binutils bison flex gawk gc gcc gnuconfig guile libmpc libtool-ltdl libtool lzo m4 make mpfr pkgconfig yacc glibc-devel isl %s
+pisi ar core --ignore-check https://github.com/pisilinux/core/raw/master/pisi-index.xml.xz && pisi ar main --ignore-check https://github.com/pisilinux/main/raw/master/pisi-index.xml.xz --at 2
 pisi ur
 sed -i 's/-j5/-j%d/g' /etc/pisi/pisi.conf
 cd /root
