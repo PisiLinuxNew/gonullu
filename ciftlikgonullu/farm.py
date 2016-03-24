@@ -54,7 +54,7 @@ class Farm:
             if self.send_file(f, binpath):
                 print("%s gonderildi" % f)
             else:
-                while not(self.send_file(f)):
+                while not(self.send_file(f, binpath)):
                     print("%s deniyoruz" % f)
                     time.sleep(5)
         print(mylist)
