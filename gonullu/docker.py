@@ -7,7 +7,7 @@ from gonullu.log import Log
 
 class Docker:
     def __init__(self, parameters=None):
-        self.log = Log
+        self.log = Log()
         self.name = None
         self.memory_limit = self.set_memory_limit(parameters.memory_limit)
         self.binds = {}
@@ -113,8 +113,8 @@ class Docker:
             if container['Names'][0].replace('/', '') == self.name:
                 self.remove()
 
-    def exit_signal(self):
+    def exit_signal(self, signal, frame):
         if self.name is not None:
             self.remove()
-        self.log.warning(message='CTRL+C\'ye tıkladınız!', new_line=True)
+        self.log.warning(message='CTRL+C\'ye tıkladınız!')
         self.log.get_exit()

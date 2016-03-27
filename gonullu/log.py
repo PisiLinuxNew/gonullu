@@ -6,43 +6,47 @@ import os
 class Log:
     def __init__(self):
         init(autoreset=True)
+        self.new_line = False
 
-    @staticmethod
-    def error(message):
+    def error(self, message, continued=False):
         # burada hata mesajlarımızı yazdıracağız.
-        print(Fore.RED + '  [x] Hata: ' + message + Style.RESET_ALL)
+        if continued is True:
+            print(Fore.RED + '  [x] Hata: ' + message + Style.RESET_ALL, end="\r")
+            self.new_line = True
+        else:
+            if self.new_line is True:
+                self.blank_line()
+            print(Fore.RED + '  [x] Hata: ' + message + Style.RESET_ALL)
+            self.new_line = False
 
-    @staticmethod
-    def information(message, continued=False, new_line=False):
+    def information(self, message, continued=False):
         # burada bilgi mesajlarımızı yazdıracağız.
         if continued is True:
             print(Fore.LIGHTBLUE_EX + '  [*] Bilgi: ' + message + Style.RESET_ALL, end="\r")
+            self.new_line = True
         else:
-            if new_line is True:
-                print('')
+            self.new_line = False
             print(Fore.LIGHTBLUE_EX + '  [*] Bilgi: ' + message + Style.RESET_ALL)
 
-
-    @staticmethod
-    def success(message, new_line=False):
+    def success(self, message):
         # burada başlarılı işlem mesajlarımızı yazdıracağız.
-        if new_line is True:
-            print('')
+        if self.new_line is True:
+            self.blank_line()
         print(Fore.GREEN + '  [+] Başarılı: ' + message + Style.RESET_ALL)
 
-    @staticmethod
-    def warning(message, new_line=False):
+    def warning(self, message, continued=False):
         # burada uyarı mesajlarımız olacak.
-        if new_line is True:
-            print('')
-        print(Fore.YELLOW + '  [!] Uyarı: ' + message + Style.RESET_ALL)
+        if continued is True:
+            print(Fore.LIGHTBLUE_EX + '  [!] Uyarı: ' + message + Style.RESET_ALL, end="\r")
+        else:
+            if self.new_line is True:
+                self.blank_line()
+            print(Fore.YELLOW + '  [!] Uyarı: ' + message + Style.RESET_ALL)
 
     @staticmethod
     def get_exit():
-        print(Fore.RED + '  [x] Programdan çıkılıyor!' + Style.RESET_ALL)
-        os.system("stty echo")
-        sys.exit(0)
+        sys.exit()
 
-    @staticmethod
-    def blank_line():
-        print()
+    def blank_line(self):
+        self.new_line = False
+        print('')

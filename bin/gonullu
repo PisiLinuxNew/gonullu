@@ -2,21 +2,23 @@
 import argparse
 import os
 import signal
+import sys
 
-import gonullu
+from gonullu import Log, Farm, Volunteer
 
 
 def main(log_main, volunteer_main, farm_main):
     while 1:
         response = farm_main.get_package()
-        if response is -1:
-            farm_main.wait(message='dir yeni paket bekleniyor.')
+        if response is -1 or response is -2:
+            if response is -1:
+                farm_main.wait(message='dir yeni paket bekleniyor.')
         else:
             volunteer_main.get_package_farm(response)
             while 1:
                 if volunteer_main.check():
                     # container bulunamadı. İşlem bitti.
-                    if farm_main.send_file(response['package']):
+                    if farm_main.send_file(response['package'], response['binary_repo_dir']):
                         success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
                                                                          response['package']), 'r').read())
                         farm_main.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
@@ -34,13 +36,14 @@ def main(log_main, volunteer_main, farm_main):
 
 
 if __name__ == "__main__":
-    pisi = gonullu
-    log = pisi.Log
+    log = Log()
 
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
     parser.add_argument('-m', '--memory', action='store', dest='memory_limit', default=50, type=int)
     parser.add_argument('-c', '--cpu', action='store', dest='cpu_set', default=1, type=int)
     parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
+
+    args = parser.parse_args()
 
     if os.getgid() != 0:
         log.error('Lütfen programı yönetici(sudo) olarak çalıştırınız.')
@@ -51,15 +54,14 @@ if __name__ == "__main__":
         log.error(message='Lütfen ilk önce docker servisini çalıştırınız!')
         log.get_exit()
 
-    args = parser.parse_args()
-    print(args)
-
     if not args.email:
         log.error(message='Lütfen bir mail adresi belirtiniz. (-e parametresi)')
         log.get_exit()
 
-    farm = gonullu.Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
-    volunteer = pisi.Volunteer(args)
+    print(args)
+
+    farm = Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
+    volunteer = Volunteer(args)
 
     # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
     signal.signal(signal.SIGINT, volunteer.exit_signal)
@@ -69,4 +71,6 @@ if __name__ == "__main__":
         os.system("stty -echo")
         main(log, volunteer, farm)
     finally:
-        volunteer.exit_signal()
+        log.error('Programdan çıkılıyor.')
+        os.system("stty echo")
+        sys.exit(0)

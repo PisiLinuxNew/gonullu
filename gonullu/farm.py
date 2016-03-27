@@ -11,29 +11,35 @@ class Farm:
         self.url = farm_url
         self.email = self.mail_control(email)
         self.time = 10
-        self.log = Log
+        self.log = Log()
         self.total_time = 0
 
     def get(self, request, json=True):
         # Get isteğini işleyip json data dönen fonksiyonumuz.
-        if json:
-            return requests.get('%s/%s' % (self.url, request)).json()
-        else:
-            return requests.get('%s/%s' % (self.url, request))
+        try:
+            response = requests.get('%s/%s' % (self.url, request))
+            if json:
+                return response.json()
+            else:
+                return response
+        except requests.ConnectionError:
+            self.log.error('Sunucuya %s saniyedir erişilemedi tekrar bağlanmaya çalışıyor!' % self.total_time,
+                           continued=True)
+            return -2
 
-    def send_file(self, package):
+    def send_file(self, package, binary_path):
         # Oluşan çıktı dosyalarını çiftliğe gönderen fonksiyonumuz.
         output_files = glob.glob('/tmp/gonullu/%s/*.[lpe]*' % package)
         for file in output_files:
-            if self.send(file):
+            if self.send(file, binary_path):
                 pass
             else:
-                while not (self.send(file)):
+                while not (self.send(file, binary_path)):
                     self.log.warning(message='%s dosyası tekrar gönderilmeye çalışılacak.' % file)
                     self.wait()
         return True
 
-    def send(self, file):
+    def send(self, file, binary_path):
         self.log.information(message='%s dosyası gönderiliyor.' % file.split('/')[-1])
         if file.split('.')[-1] in ('err', 'log'):
             content = open(file, 'r').read()
@@ -45,7 +51,7 @@ class Farm:
             file = '%s.html' % file
 
         f = {'file': open(file, 'rb')}
-        r = requests.post('%s/%s' % (self.url, 'upload'), files=f)
+        r = requests.post('%s/%s' % (self.url, 'upload'), files=f, data={'binrepopath': binary_path})
         hashx = self.sha1file(file)
 
         file = file.split('/')[-1]
@@ -60,8 +66,16 @@ class Farm:
         request = '%s/%s' % ('requestPkg', self.email)
         response = self.get(request)
 
-        if response['state'] == 200:
-            self.log.information(message='Yeni paket bulundu, paketin adı: %s' % response['package'], new_line=True)
+        if response == -1:
+            return -1
+
+        if response == -2:
+            time.sleep(self.time)
+            self.total_time += self.time
+            return -2
+
+        elif response['state'] == 200:
+            self.log.information(message='Yeni paket bulundu, paketin adı: %s' % response['package'])
             self.total_time = 0
             return response
 
