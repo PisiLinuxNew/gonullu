@@ -11,20 +11,25 @@ class Farm:
         self.url = farm_url
         self.email = self.mail_control(email)
         self.time = 10
+        self.total_error_time = 10
         self.log = Log()
-        self.total_time = 0
+        self.total_time = 10
 
     def get(self, request, json=True):
         # Get isteğini işleyip json data dönen fonksiyonumuz.
         try:
             response = requests.get('%s/%s' % (self.url, request))
             if json:
+                self.total_error_time = 10
                 return response.json()
             else:
+                self.total_error_time = 10
                 return response
         except requests.ConnectionError:
-            self.log.error('Sunucuya %s saniyedir erişilemedi tekrar bağlanmaya çalışıyor!' % self.total_time,
+            self.log.error('Sunucuya %s saniyedir erişilemedi tekrar bağlanmaya çalışıyor!' % self.total_error_time,
                            continued=True)
+            self.total_error_time += 10
+            self.total_time = 10
             return -2
 
     def send_file(self, package, binary_path):

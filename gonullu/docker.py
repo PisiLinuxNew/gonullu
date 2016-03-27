@@ -116,5 +116,7 @@ class Docker:
     def exit_signal(self, signal, frame):
         if self.name is not None:
             self.remove()
+
+        self.log.blank_line()
         self.log.warning(message='CTRL+C\'ye tıkladınız!')
         self.log.get_exit()
