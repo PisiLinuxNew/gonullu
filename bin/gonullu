@@ -7,6 +7,19 @@ import sys
 from gonullu import Log, Farm, Volunteer
 
 
+def usage():
+    print("""
+Kullanim - Usage
+Asagidaki satir, docker icindeki /etc/pisi/pisi.conf icinde bulunan
+-j parametresini verecegimiz rakam ile degistirir.
+\tsudo gonullu -j 24
+Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
+%25'ini  ayirir.
+\tsudo gonullu --cpu=70 --memory=25
+""")
+    sys.exit()
+
+
 def main(log_main, volunteer_main, farm_main):
     while 1:
         response = farm_main.get_package()
@@ -39,11 +52,16 @@ if __name__ == "__main__":
     log = Log()
 
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
+    parser.add_argument('-k', '--kullanim', action="store_true", dest='usage', default=False)
     parser.add_argument('-m', '--memory', action='store', dest='memory_limit', default=50, type=int)
     parser.add_argument('-c', '--cpu', action='store', dest='cpu_set', default=1, type=int)
     parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
+    parser.add_argument('-j', '--job', action='store', dest='job', default=5, type=int)
 
     args = parser.parse_args()
+
+    if args.usage:
+        usage()
 
     if os.getgid() != 0:
         log.error('Lütfen programı yönetici(sudo) olarak çalıştırınız.')

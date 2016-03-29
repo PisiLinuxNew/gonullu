@@ -12,6 +12,7 @@ class Volunteer(Docker):
         self.repo = None
         self.branch = None
         self.kernel_requirement = None
+        self.job = params.job
 
     def get_package_farm(self, response):
         self.package = response['package']
@@ -27,7 +28,7 @@ class Volunteer(Docker):
         self.commit_id = response['commit_id']
         self.kernel_requirement = response['kernel_required']
         self.queue_id = response['queue_id']
-        self.preparation(self.kernel_requirement, self.package, self.cpu_set)
+        self.preparation(self.kernel_requirement, self.package, self.cpu_set, self.job)
         self.set_command('/build/build-%s.sh' % self.package, self.queue_id, self.commit_id, self.package)
         self.start()
 
