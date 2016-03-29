@@ -1,54 +1,76 @@
 #!/usr/bin/env python3
-import sys
 import argparse
-import ciftlikgonullu
+import os
+import signal
+import sys
+
+from gonullu import Log, Farm, Volunteer
 
 
-def kullanim():
-    print("""
-Kullanim - Usage
-
-Asagidaki satir, docker icindeki /etc/pisi/pisi.conf icinde bulunan
--j parametresini verecegimiz rakam ile degistirir.
-The command below replaces the -j parameter in the file in the  docker
-image /etc/pisi/pisi.conf with the number given from command line.
-
-sudo gonullu -j 24
-
-
-Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
-%25'ini  ayirir.
-The command below reserves %70 of cpu and %25 of physical memory for
-docker.
-
-sudo gonullu --cpu=70 --memory=25
-
-""")
-    sys.exit()
+def main(log_main, volunteer_main, farm_main):
+    while 1:
+        response = farm_main.get_package()
+        if response is -1 or response is -2:
+            if response is -1:
+                farm_main.wait(message='dir yeni paket bekleniyor.')
+        else:
+            volunteer_main.get_package_farm(response)
+            while 1:
+                if volunteer_main.check():
+                    # container bulunamadı. İşlem bitti.
+                    if farm_main.send_file(response['package'], response['binary_repo_dir']):
+                        success = int(open('/tmp/gonullu/%s/%s.bitti' % (response['package'],
+                                                                         response['package']), 'r').read())
+                        farm_main.get('updaterunning?id=%s&state=%s' % (response['queue_id'], success), json=False)
+                        volunteer_main.remove()
+                        log_main.success(
+                            message='derleme işlemi %s paketi için %s saniyede bitti.' % (response['package'],
+                                                                                          farm_main.get_total_time())
+                        )
+                        log_main.blank_line()
+                        farm_main.wait(reset=True)
+                    break
+                else:
+                    # container bulundu. İşlem sürüyor.
+                    farm_main.wait(message='den beri derleme işlemi %s paketi için devam ediyor.' % response['package'])
 
 
 if __name__ == "__main__":
+    log = Log()
+
     parser = argparse.ArgumentParser(description='This is pisilinux volunteer application')
-    parser.add_argument('-k', '--kullanim', action="store_true", help="Kullanim. Usage", dest = "kullanim", default=False)
-    parser.add_argument('-r', '--rapor', action="store_true", help="Merkeze raporlama, islemci, ram kullanimi ve derleme loglarinin son birkac satirini belirli araliklarla merkeze gonderir.   Report the cpu and memory usage and also last few lines of compilation logs to center")
-    parser.add_argument('-j', '--make-j-num', action="store", dest="cpucount", default=5, type=int,
-                        help="make icin -j parametresine verilecek rakam. The number for the make -j")
-    parser.add_argument('-e', '--email', action="store", dest="email", type=str,
-                        help="kuyruktan paket alirken gonderilecek olan mail adresi. Email address of the volunteer.")
-    parser.add_argument('-c', '--cpu', action='store', dest='cpu', type=int, default=70,
-                        help="islemci kullanma yuzdesi. 1-100 arasi tamsayi. Cpu limit for docker. A number between \
-                        1-100 as percent.")
-    parser.add_argument('-m', '--memory', action='store', dest='memory', type=int, default=50,
-                        help="Hafiza kullanma yuzdesi. 1-100 arasi tamsayi. Memory limit for docker. A number between \
-                        1-100 as percent of total physical memory")
+    parser.add_argument('-m', '--memory', action='store', dest='memory_limit', default=50, type=int)
+    parser.add_argument('-c', '--cpu', action='store', dest='cpu_set', default=1, type=int)
+    parser.add_argument('-e', '--email', action='store', dest='email', default='ilkermanap@gmail.com', type=str)
 
     args = parser.parse_args()
-    if args.kullanim:
-        kullanim()
 
-    pisi = ciftlikgonullu
-    d = pisi.DockerVolunteer(args)
-    f = pisi.Farm("http://ciftlik.pisilinux.org/ciftlik")
-    while 1:
-        g = pisi.Volunteer(f, d)
-        g.wait(15, "Yeni paket almadan once durdurmak icin CTRL-C")
+    if os.getgid() != 0:
+        log.error('Lütfen programı yönetici(sudo) olarak çalıştırınız.')
+        log.get_exit()
+
+    docker_socket_file = '/var/run/docker.sock'
+    if not os.path.exists(docker_socket_file):
+        log.error(message='Lütfen ilk önce docker servisini çalıştırınız!')
+        log.get_exit()
+
+    if not args.email:
+        log.error(message='Lütfen bir mail adresi belirtiniz. (-e parametresi)')
+        log.get_exit()
+
+    print(args)
+
+    farm = Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
+    volunteer = Volunteer(args)
+
+    # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
+    signal.signal(signal.SIGINT, volunteer.exit_signal)
+    # CTRL+Z sinyali iptal edildi.
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+    try:
+        os.system("stty -echo")
+        main(log, volunteer, farm)
+    finally:
+        log.error('Programdan çıkılıyor.')
+        os.system("stty echo")
+        sys.exit(0)

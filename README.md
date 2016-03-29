@@ -1,15 +1,15 @@
 # Gonullu uygulamasi
 
-Gonullu uygulamasi, pisi linux dagitiminin paketlerini derlemek uzere hazirlanmistir.
-Uygulama, docker imajlari kullanarak, derleme sisteminin kuyrugunda bekleyen paketleri
-pisi paketi haline getirir ve derleme sistemine gonderir.
+Gonullu uygulamasi, pisi linux dağıtımının paketlerini derlemek üzere hazırlanmıştır.
+Uygulama, docker imajlarını kullanarak, derleme sisteminin kuyruğundan bekleyen paketleri
+pisi paketi haline getirir ve derleme sistemine gönderir.
 
-Bu uygulamayi kullanmak icin pisi linux kullanmaniz sart degildir. Docker destekleyen
-herhangi bir linux dagitiminda da calisabilir.
+Bu uygulamayi kullanmak için pisi linux kullanmaniz şart değildir. Docker destekleyen
+herhangi bir linux dağıtımınıda da kullanıyor olabilirsiniz.
 
 ## Kullanim
 
-Uygulamayi sisteminize indirmek icin
+Uygulamayı sisteminize indirmek için
 
   	   git clone https://github.com/PisiLinuxNew/gonullu
   	   cd gonullu
@@ -25,11 +25,24 @@ Uygulamayı güncellemek için
 
 Uygulamaya verilebilecek parametreleri gormek icin:
 
-  	   gonullu -h
+  	   gonullu -k
 
 ya da
 
-	   gonullu --help
+	   gonullu --kullanim
 
-Parametre vermeden kullanirsaniz, islemcinin %70'ini, hafizanin %50'sini kullanacak sekilde
-ayarlanmistir. 
+Parametre vermeden kullanırsanız 1 adet cpu ve hafızanın %50'sini kullanacak şekilde ayarlanmistir. 
+
+## Parametreler
+
+* -k veya --kullanim:
+Yazılımın kullanımı ile ilgili bilgi içerir
+
+* -m veya --memory
+Docker tarafından kullanılacak fiziksel ramin limiti
+
+* -c veya --cpu
+Docker tarafından kullanılmak üzere ayarlanacak cpu sayısı
+
+* -e veya --email:
+Mail adresiniz
