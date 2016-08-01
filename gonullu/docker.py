@@ -83,6 +83,8 @@ class Docker:
             if i not in dictionary:
                 i = dictionary[random.randint(1, dictionary_len)]
             self.name += str(i)
+        if len(self.name) == 1:
+            self.name += "_"
 
     @staticmethod
     def set_memory_limit(memory_limit):

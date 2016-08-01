@@ -137,7 +137,7 @@ class Farm:
         sha = hashlib.sha1()
         with open(filepath, 'rb') as f:
             while True:
-                block = f.read(2 ** 10)  # Magic number: one-megabyte blocks.
+                block = f.read(2 ** 20)  # Magic number: one-megabyte  blocks.
                 if not block:
                     break
                 sha.update(block)
