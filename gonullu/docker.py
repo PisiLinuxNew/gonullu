@@ -72,8 +72,6 @@ class Docker:
         self.my_client.logs(self.name)
 
     def set_name(self, name):
-        if len(name) == 1:
-            name += "x"
         # container adımızı atadığımız fonksiyonumuz.
         dictionary = 'abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ-_1234567890'
         dictionary_len = len(dictionary)
