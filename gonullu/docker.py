@@ -1,8 +1,10 @@
+import json
 import random
 import shutil
 
-from docker import Client
 import psutil
+from docker import Client
+
 from gonullu.log import Log
 
 
@@ -20,6 +22,7 @@ class Docker:
         self.my_client = None
         self.host_config = None
         self.my_container = None
+        self.tmp_status = False
 
     def start(self):
         # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
@@ -32,7 +35,20 @@ class Docker:
         # hadi şimdi aynı isimle bir containerımız var mı görelim.
         self.control_docker()
         # kullanılacak imaj son sürüme yükseltelim
-        self.my_client.pull(self.image)
+        self.tmp_status = False
+        message = '%s imajı güncelleniyor' % self.image
+        for line in self.my_client.pull(self.image, stream=True):
+            line = json.loads(line.decode('UTF-8'))
+            if line['status'] == 'Downloading':
+                if self.tmp_status is False:
+                    self.log.information(message=message)
+                    self.tmp_status = True
+                print('  %s' % line['progress'], end='\r')
+
+        if self.tmp_status is True:
+            print('')
+            self.log.information(message='İmaj son sürüme güncellendi')
+
         # my_container ile konteynırımızı oluşturuyoruz ve onda saklıyoruz.
         self.my_container = self.my_client.create_container(image=self.image, command=self.command, name=self.name,
                                                             volumes=self.volumes,
