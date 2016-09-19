@@ -26,10 +26,13 @@ setup(name='Gonullu',
       license='MIT',
       packages=['gonullu'],
       install_requires=[
-          'argparse', 'requests', 'docker-py', 'psutil', 'colorama'
+          'argparse', 'requests', 'docker-py', 'psutil', 'colorama', 'pyaml'
       ],
       scripts=['bin/gonullu'],
       include_package_data=True,
+      package_data={
+          'gonullu': ['config/*.yml']
+      },
       zip_safe=False,
       cmdclass={
           'clean': CleanCommand,
