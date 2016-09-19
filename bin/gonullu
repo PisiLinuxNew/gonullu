@@ -3,6 +3,7 @@ import argparse
 import os
 import signal
 import sys
+import traceback
 
 from gonullu import Log, Farm, Volunteer
 
@@ -88,6 +89,8 @@ if __name__ == "__main__":
     try:
         os.system("stty -echo")
         main(log, volunteer, farm)
+    except Exception as e:
+        log.error(traceback.format_exc())
     finally:
         log.error('Programdan çıkılıyor.')
         os.system("stty echo")
