@@ -28,7 +28,7 @@ class Docker:
         # containerımızı parametreleri ile çalıştıracağımız fonksiyonumuz.
         if not self.my_client:
             # my_client'de çalışan docker process'ini yakalıyorum.
-            self.my_client = Client(base_url='unix://var/run/docker.sock')
+            self.my_client = Client(base_url='unix://var/run/docker.sock', version='1.23')
 
         # container'ımızın host configlerini yapalım.
         self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
