@@ -89,8 +89,8 @@ if __name__ == "__main__":
     try:
         os.system("stty -echo")
         main(log, volunteer, farm)
-    except Exception as e:
-        log.error(traceback.format_exc())
+    except:
+      log.error('Bilinmeyen bir hata ile karşılaşıldı: %s' % ( traceback.format_exc() ))
     finally:
         log.error('Programdan çıkılıyor.')
         os.system("stty echo")
