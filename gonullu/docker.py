@@ -52,7 +52,8 @@ class Docker:
         # my_container ile konteynırımızı oluşturuyoruz ve onda saklıyoruz.
         self.my_container = self.my_client.create_container(image=self.image, command=self.command, name=self.name,
                                                             volumes=self.volumes,
-                                                            host_config=self.host_config)
+                                                            host_config=self.host_config,
+                                                            security_opt='seccomp:unconfined')
         # ve konteynırımızı çalıştırmaya başlıyoruz.
         self.my_client.start(self.name)
 
