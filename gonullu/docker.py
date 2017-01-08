@@ -31,7 +31,7 @@ class Docker:
             self.my_client = Client(base_url='unix://var/run/docker.sock', version='1.23')
 
         # container'ımızın host configlerini yapalım.
-        self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds)
+        self.host_config = self.my_client.create_host_config(mem_limit='%sM' % self.memory_limit, binds=self.binds, security_opt=['seccomp:unconfined'])
         # hadi şimdi aynı isimle bir containerımız var mı görelim.
         self.control_docker()
         # kullanılacak imaj son sürüme yükseltelim
@@ -52,8 +52,7 @@ class Docker:
         # my_container ile konteynırımızı oluşturuyoruz ve onda saklıyoruz.
         self.my_container = self.my_client.create_container(image=self.image, command=self.command, name=self.name,
                                                             volumes=self.volumes,
-                                                            host_config=self.host_config,
-                                                            security_opt='seccomp:unconfined')
+                                                            host_config=self.host_config)
         # ve konteynırımızı çalıştırmaya başlıyoruz.
         self.my_client.start(self.name)
 
