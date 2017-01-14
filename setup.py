@@ -16,7 +16,7 @@ class CleanCommand(Command):
 
 
 setup(name='Gonullu',
-      version='0.7',
+      version='1.1.3',
       description='Pisi Linux gonullu paket derleme uygulamasi',
       url='https://github.com/PisiLinuxNew/gonullu',
       author='Ilker Manap',
