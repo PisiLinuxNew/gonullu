@@ -60,7 +60,7 @@ class Volunteer(Docker):
             sandbox = ' --ignore-sandbox '
 
         build_sh = """#!/bin/bash
-service dbus start && pisi cp && pisi ar pisiBeta http://ciftlik.pisilinux.org/2.0-Beta.1/pisi-index.xml.xz && pisi it --ignore-safety --ignore-dependency autoconf autogen automake binutils bison flex gawk gc gcc gnuconfig guile libmpc libtool-ltdl libtool lzo m4 make mpfr pkgconfig yacc glibc-devel isl %s
+service dbus start && pisi cp && pisi ar pisiBeta https://ciftlik.pisilinux.org/2.0-Beta.1/pisi-index.xml.xz && pisi it --ignore-safety --ignore-dependency autoconf autogen automake binutils bison flex gawk gc gcc gnuconfig guile libmpc libtool-ltdl libtool lzo m4 make mpfr pkgconfig yacc glibc-devel isl %s
 pisi ar core --ignore-check https://github.com/pisilinux/core/raw/master/pisi-index.xml.xz && pisi ar main --ignore-check https://github.com/pisilinux/main/raw/master/pisi-index.xml.xz --at 2
 pisi ur
 sed -i 's/-j5/-j%d/g' /etc/pisi/pisi.conf
