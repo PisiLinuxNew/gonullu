@@ -64,7 +64,7 @@ service dbus start && pisi cp && pisi ar pisiBeta https://ciftlik.pisilinux.org/
 pisi ar core --ignore-check https://github.com/pisilinux/core/raw/master/pisi-index.xml.xz && pisi ar main --ignore-check https://github.com/pisilinux/main/raw/master/pisi-index.xml.xz --at 2
 pisi ur
 sed -i 's/-j5/-j%d/g' /etc/pisi/pisi.conf
-sed -i 's/build_host = localhost/build_host=farmV3/g'   /etc/pisi/pisi.conf
+sed -i 's/build_host = localhost/build_host=farmV4/g'   /etc/pisi/pisi.conf
 cd /root
 pisi bi --ignore-safety%s-y $3 1>/root/%s/$1-$2-$3.log 2>/root/%s/$1-$2-$3.err
 STAT=$?
