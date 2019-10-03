@@ -41,7 +41,8 @@ class Volunteer(Docker):
 
         with open(config_file, 'r') as sandbox_file:
             try:
-                if self.package in yaml.load(sandbox_file):
+                #FIXME! yaml.load(input) is depricated
+                if self.package in yaml.load(sandbox_file, Loader=yaml.FullLoader):
                     return False
             except:
                 self.log.error(message='%s dosyası işlenemedi' % config_file)
