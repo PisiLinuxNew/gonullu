@@ -1,7 +1,6 @@
 - glibc
 - dejavu-fonts
 - findutils
-- e2fsprogs
 - gtk2
 - ModemManager
 - vlc
