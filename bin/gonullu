@@ -24,8 +24,8 @@ Asagidaki satir, docker icin islemcinin %70'ini, fiziksel hafizanin
 def main(log_main, volunteer_main, farm_main):
     while 1:
         response = farm_main.get_package()
-        if response is -1 or response is -2:
-            if response is -1:
+        if (response == -1) or (response ==  -2):
+            if response == -1:
                 farm_main.wait(message='dir yeni paket bekleniyor.')
         else:
             volunteer_main.get_package_farm(response)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     print(args)
 
-    farm = Farm('http://ciftlik.pisilinux.org/ciftlik', args.email)
+    farm = Farm('https://ciftlik.pisilinux.org/', args.email)
     volunteer = Volunteer(args)
 
     # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
