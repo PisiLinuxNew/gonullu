@@ -41,7 +41,8 @@ class Volunteer(Docker):
 
         with open(config_file, 'r') as sandbox_file:
             try:
-                if self.package in yaml.load(sandbox_file):
+                #FIXME! yaml.load(input) is depricated
+                if self.package in yaml.load(sandbox_file, Loader=yaml.FullLoader):
                     return False
             except:
                 self.log.error(message='%s dosyası işlenemedi' % config_file)
@@ -60,11 +61,11 @@ class Volunteer(Docker):
             sandbox = ' --ignore-sandbox '
 
         build_sh = """#!/bin/bash
-service dbus start && pisi cp && pisi ar pisiBeta http://ciftlik.pisilinux.org/2.0-Beta.1/pisi-index.xml.xz && pisi it --ignore-safety --ignore-dependency autoconf autogen automake binutils bison flex gawk gc gcc gnuconfig guile libmpc libtool-ltdl libtool lzo m4 make mpfr pkgconfig yacc glibc-devel isl %s
+service dbus start && pisi cp && update-ca-certificates && pisi ar pisiBeta https://beta.pisilinux.org/pisi-index.xml.xz && pisi it --ignore-safety --ignore-dependency autoconf autogen automake binutils bison flex gawk gc gcc gnuconfig guile libmpc libsigsegv libtool-ltdl libtool lzo m4 make mpfr nasm pkgconfig yacc glibc-devel isl %s
 pisi ar core --ignore-check https://github.com/pisilinux/core/raw/master/pisi-index.xml.xz && pisi ar main --ignore-check https://github.com/pisilinux/main/raw/master/pisi-index.xml.xz --at 2
 pisi ur
 sed -i 's/-j5/-j%d/g' /etc/pisi/pisi.conf
-sed -i 's/build_host = localhost/build_host=farmV3/g'   /etc/pisi/pisi.conf
+sed -i 's/build_host = localhost/build_host=farmV5/g'   /etc/pisi/pisi.conf
 cd /root
 pisi bi --ignore-safety%s-y $3 1>/root/%s/$1-$2-$3.log 2>/root/%s/$1-$2-$3.err
 STAT=$?
