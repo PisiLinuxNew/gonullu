@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     print(args)
 
-    farm = Farm('https://ciftlik.pisilinux.org/', args.email)
+    farm = Farm('https://ciftlik.pisilinux.org', args.email)
     volunteer = Volunteer(args)
 
     # CTRL+C call_exit'e yönlendirildi. Bu sayede çalışan container silinecek ve öyle çıkış yapılacak.
