@@ -1,8 +1,6 @@
 import glob
 import time
-
 import requests
-
 from gonullu.log import Log
 
 
@@ -19,15 +17,15 @@ class Farm:
         # Get isteğini işleyip json data dönen fonksiyonumuz.
         try:
             response = requests.get('%s/%s' % (self.url, request))
+            response.raise_for_status()  # HTTP hatalarını yakalamak için
             if json:
                 self.total_error_time = 10
                 return response.json()
             else:
                 self.total_error_time = 10
                 return response
-        except requests.ConnectionError:
-            self.log.error('Sunucuya %s saniyedir erişilemedi tekrar bağlanmaya çalışıyor!' % self.total_error_time,
-                           continued=True)
+        except requests.exceptions.RequestException as e:
+            self.log.error('Sunucuya %s saniyedir erişilemedi tekrar bağlanmaya çalışıyor! Hata: %s' % (self.total_error_time, str(e)), continued=True)
             self.total_error_time += 10
             self.total_time = 10
             return -2
@@ -35,40 +33,52 @@ class Farm:
     def send_file(self, package, binary_path):
         # Oluşan çıktı dosyalarını çiftliğe gönderen fonksiyonumuz.
         output_files = glob.glob('/tmp/gonullu/%s/*.[lpe]*' % package)
+        if not output_files:
+            self.log.error('Dosya bulunamadı: /tmp/gonullu/%s/*.[lpe]*' % package)
+            return False
+
         for file in output_files:
-            if self.send(file, binary_path):
-                pass
-            else:
-                while not (self.send(file, binary_path)):
-                    self.log.warning(message='%s dosyası tekrar gönderilmeye çalışılacak.' % file)
+            retry_count = 0
+            max_retries = 3
+            while retry_count < max_retries:
+                if self.send(file, binary_path):
+                    break
+                else:
+                    self.log.warning(message='%s dosyası tekrar gönderilmeye çalışılacak. Deneme: %d' % (file, retry_count + 1))
                     self.wait()
+                    retry_count += 1
+            else:
+                self.log.error(message='%s dosyası gönderilemedi!' % file)
+                return False
         return True
 
     def send(self, file, binary_path):
         self.log.information(message='%s dosyası gönderiliyor.' % file.split('/')[-1])
         if file.split('.')[-1] in ('err', 'log'):
-            content = open(file, 'r').read()
-            html = open('%s.html' % file, 'w')
-            html.write('<html><body><pre>')
-            html.write(content)
-            html.write('</pre></body></html>')
-            html.close()
+            with open(file, 'r') as f:
+                content = f.read()
+            with open('%s.html' % file, 'w') as html:
+                html.write('<html><body><pre>')
+                html.write(content)
+                html.write('</pre></body></html>')
             file = '%s.html' % file
 
-        f = {'file': open(file, 'rb')}
         try:
-            r = requests.post('%s/%s' % (self.url, 'upload'), files=f, data={'binrepopath': binary_path})
-            hashx = self.sha1file(file)
+            with open(file, 'rb') as f:
+                files = {'file': f}
+                r = requests.post('%s/%s' % (self.url, 'upload'), files=files, data={'binrepopath': binary_path})
+                r.raise_for_status()  # HTTP hatalarını yakalamak için
+                hashx = self.sha1file(file)
 
-            file = file.split('/')[-1]
-            if hashx == r.text.strip():
-                self.log.success(message='%s dosyası başarı ile gönderildi.' % file)
-                return True
-            else:
-                self.log.error(message='%s dosyası gönderilemedi!' % file)
-                return False
-        except requests.ConnectionError:
-            self.log.error(message='%s dosyası gönderilemedi!' % file)
+                file = file.split('/')[-1]
+                if hashx == r.text.strip():
+                    self.log.success(message='%s dosyası başarı ile gönderildi.' % file)
+                    return True
+                else:
+                    self.log.error(message='%s dosyası gönderilemedi!' % file)
+                    return False
+        except requests.exceptions.RequestException as e:
+            self.log.error(message='%s dosyası gönderilemedi! Hata: %s' % (file, str(e)))
             return False
 
     def get_package(self):
@@ -83,7 +93,11 @@ class Farm:
             self.total_time += self.time
             return -2
 
-        elif response['state'] == 200:
+        if not isinstance(response, dict):
+            self.log.error(message='Geçersiz yanıt alındı!')
+            return -1
+
+        if response['state'] == 200:
             self.log.information(message='Yeni paket bulundu, paketin adı: %s' % response['package'])
             self.total_time = 0
             return response
@@ -104,10 +118,10 @@ class Farm:
             self.log.get_exit()
 
     def wait(self, message='', reset=False):
-        if reset is True:
+        if reset:
             self.total_time = 0
 
-        if not message == '':
+        if message:
             information_message = '%d saniye%s' % (self.total_time, message)
             self.log.information(message=information_message, continued=True)
         time.sleep(self.time)
@@ -117,12 +131,12 @@ class Farm:
         return self.total_time
 
     def running_process(self):
-        # uygulama çalışmaya devam ettiği sürece siteye bildirim göndereceğiz.
+        # Uygulama çalışmaya devam ettiği sürece siteye bildirim göndereceğiz.
         # TODO: İlker abiden devam ediyor olan uygulamalar kısmına bunun ile ilgili bir servis isteyeceğiz.
         pass
 
     def complete_process(self):
-        # uygulama çalışması bitince çalışacak olan prosedür fonksiyonumuz.
+        # Uygulama çalışması bitince çalışacak olan prosedür fonksiyonumuz.
         pass
 
     @staticmethod
@@ -137,7 +151,7 @@ class Farm:
         sha = hashlib.sha1()
         with open(filepath, 'rb') as f:
             while True:
-                block = f.read(2 ** 20)  # Magic number: one-megabyte  blocks.
+                block = f.read(2 ** 20)  # Magic number: one-megabyte blocks.
                 if not block:
                     break
                 sha.update(block)
